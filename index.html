@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>单词大师 · 四级 / 六级</title>
 <meta name="application-name" content="单词大师">
-<meta name="app-version" content="2026.11.22.8">
+<meta name="app-version" content="2026.11.22.9">
 <meta name="app-build-date" content="2026-11-22">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23007AFF'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='19' font-weight='600' fill='%23FFFFFF' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
 <style>
@@ -2102,6 +2102,167 @@ body.dark .bookpick.on{background:rgba(10,132,255,.20);border-color:rgba(100,181
   appearance:none !important;
   -webkit-backdrop-filter:none !important;
   backdrop-filter:none !important;
+}
+/* ============================================================
+   精炼：每日新学 + 次日滚动复习
+   ============================================================ */
+.appglyph.refine{
+  --appc:#d96500;
+  background:
+    radial-gradient(120% 130% at 18% -22%,rgba(255,255,255,.42),transparent 58%),
+    linear-gradient(148deg,rgba(255,149,0,.20),rgba(255,255,255,.025) 56%,rgba(255,149,0,.11));
+}
+body.dark .appglyph.refine{--appc:#ffbd66}
+.rf-entry{
+  position:relative;overflow:hidden;width:100%;display:flex;align-items:center;gap:12px;text-align:left;
+  padding:12px 14px;margin:0 0 15px;border-radius:20px;
+  background:var(--lq-clear);border:1px solid var(--lq-rim);box-shadow:var(--lq-shadow);
+  -webkit-backdrop-filter:var(--lq-blur);backdrop-filter:var(--lq-blur);
+}
+.rf-entry::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.34),transparent 34%);
+  opacity:.5;
+}
+.rf-entry .ic{
+  position:relative;z-index:1;flex:0 0 42px;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+  color:#fff;background:linear-gradient(145deg,#ff9f0a,#e06b00);
+  box-shadow:0 8px 20px rgba(224,107,0,.25),inset 0 1px 0 rgba(255,255,255,.62);
+}
+.rf-entry .ic svg{width:22px;height:22px}
+.rf-entry .tx{position:relative;z-index:1;min-width:0;flex:1}
+.rf-entry .tx b{display:block;font-size:15px;line-height:1.2;color:var(--ink);letter-spacing:-.2px}
+.rf-entry .tx small{display:block;margin-top:3px;font-size:10.5px;line-height:1.3;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rf-entry .side{position:relative;z-index:1;flex:0 0 auto;font-size:10.5px;font-weight:650;color:#c65f00;padding:5px 8px;border-radius:9px;background:rgba(255,159,10,.12);border:1px solid rgba(255,159,10,.20)}
+body.dark .rf-entry .side{color:#ffbd66;background:rgba(255,159,10,.14);border-color:rgba(255,189,102,.22)}
+body.has-wall .rf-entry .tx b,body.has-wall .rf-entry .tx small{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 3px rgba(0,0,0,.55)}
+body.has-wall .rf-entry .side{color:#fff;background:rgba(0,0,0,.22);border-color:rgba(255,255,255,.35);text-shadow:0 1px 2px rgba(0,0,0,.8)}
+
+.rf-config .panel h3{margin:0 0 10px;font-size:14px;font-weight:650}
+.rf-kicker{font-size:9.5px;letter-spacing:.18em;font-weight:700;color:#c65f00;margin-bottom:5px}
+body.dark .rf-kicker{color:#ffbd66}
+.rf-intro{padding:17px 18px;margin-bottom:14px}
+.rf-intro h2{margin:0;font-size:21px;line-height:1.25;letter-spacing:-.4px;color:var(--ink)}
+.rf-intro p{margin:8px 0 0;font-size:12px;line-height:1.62;color:var(--muted)}
+.rf-block{margin-top:19px}
+.rf-block:first-child{margin-top:0}
+.rf-label{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px}
+.rf-label b{font-size:13px;font-weight:650;color:var(--ink)}
+.rf-label span{font-size:10px;color:var(--muted)}
+.rf-books{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rf-book{
+  min-width:0;padding:11px 8px 10px;border-radius:13px;text-align:left;
+  background:var(--card);border:1px solid var(--line);color:var(--ink);
+  transition:.16s;
+}
+.rf-book b{display:block;font-size:12.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rf-book span{display:block;margin-top:3px;font-size:9.5px;line-height:1.2;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rf-book.on{border-color:rgba(255,159,10,.55);background:rgba(255,159,10,.10);box-shadow:inset 0 0 0 1px rgba(255,159,10,.16)}
+.rf-book.on b{color:#b85b00}
+body.dark .rf-book.on b{color:#ffbd66}
+body.has-wall .rf-book{background:rgba(0,0,0,.18);border-color:rgba(255,255,255,.36);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+body.has-wall .rf-book span{color:rgba(255,255,255,.78)}
+body.has-wall .rf-book.on{background:rgba(255,159,10,.24);border-color:rgba(255,189,102,.70)}
+body.has-wall .rf-book.on b{color:#fff}
+.rf-daily{display:flex;align-items:center;gap:12px}
+.rf-step{
+  width:38px;height:38px;flex:0 0 38px;border-radius:12px;display:grid;place-items:center;
+  border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:20px;line-height:1;
+}
+.rf-daily b{font-size:30px;line-height:1;font-weight:700;letter-spacing:-.8px;font-variant-numeric:tabular-nums;min-width:56px;text-align:center}
+.rf-daily span{font-size:11px;color:var(--muted);white-space:nowrap}
+.rf-presets{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.rf-preset{padding:6px 10px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:10.5px;font-weight:600}
+.rf-preset.on{border-color:rgba(255,159,10,.5);background:rgba(255,159,10,.10);color:#b85b00}
+body.dark .rf-preset.on{color:#ffbd66}
+body.has-wall .rf-preset{background:rgba(0,0,0,.18);border-color:rgba(255,255,255,.34);color:rgba(255,255,255,.82)}
+body.has-wall .rf-preset.on{background:rgba(255,159,10,.24);color:#fff}
+.rf-summary{margin-top:13px;padding:11px 12px;border-radius:12px;background:var(--accent-soft);color:var(--ink-2);font-size:11px;line-height:1.55}
+body.has-wall .rf-summary{background:rgba(0,0,0,.22);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.75)}
+.rf-create{width:100%;margin-top:14px}
+body.has-wall .rf-config .panel h3,body.has-wall .rf-label b,body.has-wall .rf-intro h2{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.95)}
+body.has-wall .rf-intro p,body.has-wall .rf-label span{color:rgba(255,255,255,.80)}
+
+.rf-hero{padding:18px 18px 16px;margin-bottom:13px}
+.rf-hero-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rf-hero-top span{font-size:9.5px;letter-spacing:.16em;font-weight:700;color:#c65f00}
+body.dark .rf-hero-top span{color:#ffbd66}
+.rf-hero-top em{font-style:normal;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rf-hero h2{margin:9px 0 0;font-size:23px;line-height:1.28;letter-spacing:-.5px;color:var(--ink)}
+.rf-hero h2 b{font-weight:750;color:#c65f00}
+body.dark .rf-hero h2 b{color:#ffbd66}
+.rf-hero p{margin:6px 0 0;font-size:11.5px;line-height:1.55;color:var(--muted)}
+.rf-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:15px}
+.rf-stat{padding:10px 9px 9px;border-radius:12px;background:var(--card);border:1px solid var(--line);min-width:0}
+.rf-stat b{display:block;font-size:19px;line-height:1.05;font-weight:700;letter-spacing:-.4px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rf-stat span{display:block;margin-top:4px;font-size:9.5px;line-height:1.2;color:var(--muted);white-space:nowrap}
+.rf-progress{margin-top:14px}
+body.has-wall .rf-hero h2,body.has-wall .rf-stat b{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.95)}
+body.has-wall .rf-hero h2 b{color:#ffd08a}
+body.has-wall .rf-hero p,body.has-wall .rf-stat span{color:rgba(255,255,255,.80)}
+body.has-wall .rf-stat{background:rgba(0,0,0,.18);border-color:rgba(255,255,255,.30)}
+.rf-section-h{display:flex;align-items:baseline;justify-content:space-between;margin:18px 2px 8px}
+.rf-section-h b{font-size:13px;font-weight:650;color:var(--ink)}
+.rf-section-h span{font-size:10.5px;color:var(--muted)}
+body.has-wall .rf-section-h b{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.9)}
+body.has-wall .rf-section-h span{color:rgba(255,255,255,.78)}
+.continue.rf-review{
+  background:
+    radial-gradient(100% 140% at 18% -40%,rgba(255,255,255,.28),transparent 58%),
+    linear-gradient(145deg,rgba(255,159,10,.90),rgba(214,103,0,.82));
+  border-color:rgba(255,255,255,.36);
+  box-shadow:0 18px 44px rgba(214,103,0,.24),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -12px 24px -18px rgba(80,35,0,.50);
+}
+.rf-done{
+  display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:18px;
+  background:var(--card);border:1px solid var(--line);color:var(--ink);
+  -webkit-backdrop-filter:var(--lq-blur);backdrop-filter:var(--lq-blur);
+}
+.rf-done .ic{width:34px;height:34px;flex:0 0 34px;border-radius:50%;display:grid;place-items:center;background:rgba(48,199,110,.14);color:#0d9f4f;font-weight:800}
+.rf-done .tx{min-width:0}
+.rf-done .tx b{display:block;font-size:14px;line-height:1.2}
+.rf-done .tx span{display:block;margin-top:3px;font-size:10.5px;color:var(--muted)}
+body.has-wall .rf-done{background:rgba(0,0,0,.18);border-color:rgba(255,255,255,.34);color:#fff}
+body.has-wall .rf-done .tx span{color:rgba(255,255,255,.78)}
+.rf-note{margin-top:10px;padding:10px 12px;border-radius:11px;background:rgba(255,159,10,.08);border:1px solid rgba(255,159,10,.15);font-size:10.5px;line-height:1.55;color:var(--ink-2)}
+body.has-wall .rf-note{background:rgba(0,0,0,.20);border-color:rgba(255,255,255,.26);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+.rf-bottom{margin-top:16px}
+
+.rf-prompt-cn{
+  font-size:clamp(22px,5.6vw,31px);line-height:1.36;font-weight:650;letter-spacing:-.3px;
+  color:var(--ink);text-align:center;margin:4px auto 0;max-width:100%;
+}
+.rf-prompt-cn.rf-prompt-long{font-size:clamp(18px,4vw,23px);line-height:1.45;letter-spacing:0}
+.rf-prompt-sub{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:10px;min-height:22px}
+.rf-tip{font-size:10.5px;color:var(--muted);line-height:1.3}
+.rf-maskline{display:flex;align-items:flex-end;justify-content:center;gap:4px;flex-wrap:wrap;margin-top:18px;font-family:"New York","Times New Roman",Georgia,serif;font-size:30px;line-height:1.1;letter-spacing:.04em;color:var(--ink)}
+.rf-letter{display:inline-block;min-width:.55em;text-align:center}
+.rf-blank{display:inline-block;width:.68em;height:1.02em;border-bottom:2px solid var(--accent);margin:0 1px;border-radius:1px}
+.rf-space{display:inline-block;width:.32em}
+.rf-fillbox{margin-top:22px}
+.rf-fill-form{display:flex;gap:8px;align-items:stretch}
+.rf-fill-input{
+  flex:1;min-width:0;height:49px;border-radius:14px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink);padding:0 14px;font-size:16px;letter-spacing:.04em;outline:none;
+  -webkit-appearance:none;appearance:none;
+}
+.rf-fill-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.rf-fill-input::placeholder{font-size:11px;letter-spacing:0;color:var(--muted)}
+.rf-fill-result{padding:12px 14px;border-radius:13px;font-size:13px;line-height:1.4;border:1px solid var(--line);background:var(--card);color:var(--ink-2)}
+.rf-fill-result.ok{border-color:rgba(48,199,110,.32);background:rgba(48,199,110,.09)}
+.rf-fill-result.no{border-color:rgba(255,59,48,.28);background:rgba(255,59,48,.07)}
+.rf-fill-result b{font-size:16px;letter-spacing:.02em;color:var(--ink)}
+body.has-wall .rf-prompt-cn,body.has-wall .rf-maskline,body.has-wall .rf-fill-result b{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 3px rgba(0,0,0,.55)}
+body.has-wall .rf-fill-input{background:rgba(0,0,0,.24);border-color:rgba(255,255,255,.48);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.9)}
+body.has-wall .rf-fill-input::placeholder{color:rgba(255,255,255,.68)}
+body.has-wall .rf-tip{color:rgba(255,255,255,.78)}
+body.dark .rf-fill-result{background:var(--card)}
+
+@media (max-width:360px){
+  .rf-books{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .rf-book b{font-size:11.5px}
+  .rf-daily b{font-size:27px}
+  .rf-maskline{font-size:26px}
 }
 </style>
 </head>
@@ -18935,7 +19096,7 @@ const EXAMPLES = {"abandon":[["v.",[["He claimed that his parents had abandoned 
    ============================================================ */
 const N = WORDS.length;
 const LS_KEY = 'cet4vocab_20d_v1';
-const APP_VERSION = '2026.11.22.8';
+const APP_VERSION = '2026.11.22.9';
 const APP_VERSION_DATE = '2026-11-22';
 const UPDATE_DEFAULT_SRC = 'https://zhaowenhan371-blip.github.io/word-master/update.json';
 let updateFound = null;
@@ -18965,7 +19126,9 @@ function saveDeepSeek(){
 loadDeepSeek();
 
 const TYPE_META = {
-  en2cn : {label:'选词义', hint:'选出这个单词的中文释义'}
+  en2cn : {label:'选词义', hint:'选出这个单词的中文释义'},
+  cn2en : {label:'选单词', hint:'根据中文释义选出对应的英文单词'},
+  fill  : {label:'补拼写', hint:'看中文补全英文单词'}
 };
 
 const ICON = {
@@ -18984,6 +19147,7 @@ const ICON = {
   chart : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5M12.5 16V8M17 16v-3"/></svg>',
   search: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.2"/><path d="M15.5 15.5l4.2 4.2"/></svg>',
   spark : '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18.5 14.5 l0.8 2.2 l2.2 0.8 l-2.2 0.8 l-0.8 2.2 l-0.8 -2.2 l-2.2 -0.8 l2.2 -0.8 z"/></svg>',
+  refine: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7.5A8 8 0 007.7 4.4L4 8"/><path d="M4 4v4h4"/><path d="M4 16.5A8 8 0 0016.3 19.6L20 16"/><path d="M20 20v-4h-4"/></svg>',
   trophy: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v4.2a4 4 0 01-8 0z"/><path d="M8 5H5.2a2.8 2.8 0 003 3M16 5h2.8a2.8 2.8 0 01-3 3"/><path d="M12 12.2v4.1M8.8 19h6.4M9.5 16.3h5"/></svg>',
   ext   : '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 5h6v6"/><path d="M19 5l-8 8"/><path d="M19 14v4.5A1.5 1.5 0 0117.5 20h-13A1.5 1.5 0 013 18.5v-13A1.5 1.5 0 014.5 3H9"/></svg>'
 };
@@ -19107,7 +19271,8 @@ function blankState(){
   return {
     settings:{ days:20, sound:0, theme:'light', voice:'', audio:'online', accent:'us', wallpaper:'', wallTone:'', updateUrl:'' },
     words:{}, wrong:{}, fav:{}, days:{}, dates:{}, trophies:{}, session:null, coach:[], planBook:'cet4',
-    customBooks:[], customSeq:100000
+    customBooks:[], customSeq:100000,
+    refine:null, refineCfg:{ books:'cet4', daily:30 }
   };
 }
 let state = blankState();
@@ -19226,6 +19391,293 @@ function libAllIds(){
   return out;
 }
 
+/* ============================================================
+   精炼计划：状态、选题与滚动复习
+   ============================================================ */
+const REFINE_TYPES = ['en2cn','cn2en','fill'];
+function refineClampDaily(v){
+  v = Math.round((Number(v)||30)/5)*5;
+  return Math.max(10, Math.min(100, v));
+}
+function refineBookLabel(b){
+  return b==='cet6' ? '六级' : (b==='both' ? '四级 + 六级' : '四级');
+}
+function refineBookShort(b){
+  return b==='cet6' ? '六级' : (b==='both' ? '四六级' : '四级');
+}
+function refinePoolIds(b){
+  if(b==='cet6') return CET6_IDS.slice();
+  if(b==='both') return libAllIds();
+  return cet4Ids();
+}
+function refinePoolCount(b){ return refinePoolIds(b).length; }
+function refineNormalizeState(){
+  if(!state.refineCfg || typeof state.refineCfg!=='object') state.refineCfg = { books:'cet4', daily:30 };
+  if(state.refineCfg.books!=='cet4' && state.refineCfg.books!=='cet6' && state.refineCfg.books!=='both') state.refineCfg.books='cet4';
+  state.refineCfg.daily = refineClampDaily(state.refineCfg.daily);
+  const p = state.refine;
+  if(!p || typeof p!=='object'){ state.refine = null; return; }
+  if(p.books!=='cet4' && p.books!=='cet6' && p.books!=='both') p.books='cet4';
+  p.daily = refineClampDaily(p.daily);
+  if(!Array.isArray(p.ids)){ state.refine = null; return; }
+  const seenIds = {};
+  p.ids = p.ids.map(Number).filter(function(i){
+    if(!(i>=0) || seenIds[i]) return false;
+    seenIds[i]=1;
+    return true;
+  });
+  if(!p.ids.length){ state.refine = null; return; }
+  p.totalDays = Math.max(1, Math.ceil(p.ids.length/p.daily));
+  p.curDay = Math.max(0, Math.min(p.totalDays-1, Math.floor(Number(p.curDay)||0)));
+  if(!p.seen || typeof p.seen!=='object') p.seen = {};
+  p.finished = !!p.finished;
+  if(p.finished) p.curDay = p.totalDays-1;
+}
+function refineSeenKey(i,t){ return String(i)+'|'+String(t); }
+function refineSeenCount(p,i){
+  let n=0;
+  for(let k=0;k<REFINE_TYPES.length;k++){ if(p.seen[refineSeenKey(i,REFINE_TYPES[k])]) n++; }
+  return n;
+}
+function refineTypeOrder(i){
+  const h = hashStr('refine|'+i) >>> 0;
+  const a = h % REFINE_TYPES.length;
+  return [
+    REFINE_TYPES[a],
+    REFINE_TYPES[(a+1)%REFINE_TYPES.length],
+    REFINE_TYPES[(a+2)%REFINE_TYPES.length]
+  ];
+}
+function refinePickType(p,i){
+  const order = refineTypeOrder(i);
+  for(let k=0;k<order.length;k++){
+    if(!p.seen[refineSeenKey(i,order[k])]) return order[k];
+  }
+  return '';
+}
+function refineNewIds(p,d){
+  if(!p || !p.ids || d<0 || d>=p.totalDays) return [];
+  return p.ids.slice(d*p.daily, Math.min(p.ids.length, (d+1)*p.daily));
+}
+function refineReviewIds(p,d){
+  if(!p || d<=0) return [];
+  return refineNewIds(p, d-1);
+}
+function refineNewDone(p,d){
+  const list = refineNewIds(p,d);
+  if(!list.length) return false;
+  return list.every(function(i){ return refineSeenCount(p,i)>=1; });
+}
+function refineReviewDone(p,d){
+  if(d<=0) return true;
+  const list = refineReviewIds(p,d);
+  if(!list.length) return true;
+  return list.every(function(i){ return refineSeenCount(p,i)>=2; });
+}
+function refineDayDone(p,d){
+  return refineNewDone(p,d) && refineReviewDone(p,d);
+}
+function refineSync(){
+  const p=state.refine;
+  if(!p) return false;
+  if(S && S.mode==='refine') return false;
+  let moved=false;
+  let guard=0;
+  while(!p.finished && guard++<=p.totalDays){
+    if(!refineDayDone(p,p.curDay)) break;
+    if(p.curDay>=p.totalDays-1){
+      p.finished=true;
+      moved=true;
+      break;
+    }
+    p.curDay++;
+    moved=true;
+  }
+  if(moved) save();
+  return moved;
+}
+function refineDoneWordCount(p){
+  if(!p) return 0;
+  if(p.finished) return p.ids.length;
+  let n = Math.min(p.ids.length, p.curDay*p.daily);
+  if(refineNewDone(p,p.curDay)) n += refineNewIds(p,p.curDay).length;
+  return Math.min(p.ids.length, n);
+}
+function refineDoneDays(p){
+  if(!p) return 0;
+  return p.finished ? p.totalDays : p.curDay;
+}
+function refineFillNorm(s){
+  return String(s==null?'':s).toLowerCase().replace(/[^a-z]/g,'');
+}
+function refineMaskWord(word, rnd){
+  const s = String(word||'');
+  const chars = s.split('');
+  const letters = [];
+  chars.forEach(function(ch,k){ if(/[A-Za-z]/.test(ch)) letters.push(k); });
+  if(letters.length<=1){
+    return { mask:s, missing:'', answer:refineFillNorm(s) };
+  }
+  let hideCount;
+  if(letters.length<=4) hideCount=1;
+  else if(letters.length<=8) hideCount=2;
+  else hideCount=Math.min(4, Math.max(2, Math.round(letters.length*0.32)));
+  hideCount = Math.min(hideCount, letters.length-1);
+  let candidates = letters.length>=4 ? letters.slice(1, letters.length-1) : letters.slice(1);
+  if(!candidates.length) candidates = letters.slice(0, letters.length-1);
+  const pool = candidates.slice();
+  shuffle(pool, rnd);
+  const hide = pool.slice(0, hideCount);
+  const hideSet = {};
+  hide.forEach(function(k){ hideSet[k]=1; });
+  const missing = hide.sort(function(a,b){ return a-b; }).map(function(k){ return chars[k]; }).join('');
+  const mask = chars.map(function(ch,k){ return hideSet[k] ? '_' : ch; }).join('');
+  return { mask:mask, missing:refineFillNorm(missing), answer:refineFillNorm(s) };
+}
+function refineFillCorrect(q,ans){
+  const v = refineFillNorm(ans);
+  if(!v) return false;
+  return v===q.answer || (!!q.missing && v===q.missing);
+}
+function refineMaskHtml(mask){
+  return String(mask||'').split('').map(function(ch){
+    if(ch==='_') return '<span class="rf-blank"></span>';
+    if(ch===' ') return '<span class="rf-space"></span>';
+    return '<span class="rf-letter">'+esc(ch)+'</span>';
+  }).join('');
+}
+function refineMakeQ(i,t,pool){
+  const it = WORDS[i];
+  if(!it) return null;
+  const rnd = makeRnd(hashStr('refineq|'+i+'|'+t));
+  if(t==='en2cn'){
+    const q = makeQ(i, rnd, pool);
+    q.t='en2cn';
+    return q;
+  }
+  if(t==='cn2en'){
+    const word = String(it[0]||''), cn = cleanDef(it[3], it[0]);
+    const ds=[], seen={};
+    seen[word.toLowerCase()]=1;
+    let tries=0;
+    while(ds.length<3 && tries<1600){
+      tries++;
+      const j = pool && pool.length>=4 ? pool[Math.floor(rnd()*pool.length)] : Math.floor(rnd()*N);
+      if(typeof j!=='number' || !WORDS[j] || j===i || ds.indexOf(j)>=0) continue;
+      const wj = String(WORDS[j][0]||'');
+      if(!wj || seen[wj.toLowerCase()]) continue;
+      const cj = cleanDef(WORDS[j][3], wj);
+      if(!cj || clash(cn,cj)) continue;
+      ds.push(j);
+      seen[wj.toLowerCase()]=1;
+    }
+    tries=0;
+    while(ds.length<3 && tries<800){
+      tries++;
+      const j = pool && pool.length>=4 ? pool[Math.floor(rnd()*pool.length)] : Math.floor(rnd()*N);
+      if(typeof j!=='number' || !WORDS[j] || j===i || ds.indexOf(j)>=0) continue;
+      const wj = String(WORDS[j][0]||'');
+      if(!wj || seen[wj.toLowerCase()]) continue;
+      ds.push(j);
+      seen[wj.toLowerCase()]=1;
+    }
+    const opts=[{text:word, ok:true, i:i, pos:it[2]}];
+    ds.forEach(function(j){ opts.push({text:String(WORDS[j][0]||''), ok:false, i:j, pos:WORDS[j][2]}); });
+    shuffle(opts,rnd);
+    return {t:'cn2en', i:i, opts:opts, chosen:-1};
+  }
+  const word=String(it[0]||'');
+  const mask = refineMaskWord(word, rnd);
+  return {
+    t:'fill', i:i, chosen:-1, mask:mask.mask, missing:mask.missing, answer:mask.answer,
+    answerText:'', draft:'',
+    opts:[{text:word, ok:true, i:i, pos:it[2]}, {text:'', ok:false, i:-1, pos:''}]
+  };
+}
+function refineBuildQs(ids, pool, doneCount){
+  const p=state.refine;
+  const qs=[];
+  if(!p) return qs;
+  (ids||[]).forEach(function(i){
+    if(!WORDS[i]) return;
+    if(refineSeenCount(p,i) >= (doneCount||1)) return;
+    const t = refinePickType(p,i);
+    if(!t) return;
+    const q = refineMakeQ(i,t,pool || p.ids);
+    if(!q) return;
+    q.key = refineSeenKey(i,t);
+    qs.push(q);
+  });
+  for(let k=qs.length-1;k>0;k--){
+    const j=Math.floor(Math.random()*(k+1));
+    const t=qs[k]; qs[k]=qs[j]; qs[j]=t;
+  }
+  return qs;
+}
+function startRefine(kind){
+  const p=state.refine;
+  if(!p){ toast('先制定一个精炼计划'); return; }
+  if(p.finished){ toast('这一轮已经完成，可以重新制定'); return; }
+  const day=p.curDay;
+  if(kind!=='new' && kind!=='review') return;
+  const cur = state.session;
+  if(cur && cur.mode==='refine' && cur.refineDay===day && cur.refineKind===kind && cur.qs && cur.qs.length){
+    S=cur;
+    go('#/quiz');
+    return;
+  }
+  if(kind==='new' && refineNewDone(p,day)){ toast('今天的新词已经学完了'); return; }
+  if(kind==='review' && day<=0){ toast('Day 1 先学新词，明天开始滚动复习'); return; }
+  if(kind==='review' && refineReviewDone(p,day)){ toast('今天的复习已经完成了'); return; }
+  const ids = kind==='new' ? refineNewIds(p,day) : refineReviewIds(p,day);
+  const qs = refineBuildQs(ids, p.ids, kind==='new'?1:2);
+  if(!qs.length){ toast('这一组词已经全部练过'); return; }
+  const label = '精炼 · Day '+(day+1)+' · '+(kind==='new'?'新词':'复习');
+  startQs(qs, 'refine', -1, label, { refineDay:day, refineKind:kind, book:'' });
+}
+function refineCreatePlan(){
+  const cfg = state.refineCfg || {books:'cet4', daily:30};
+  const books = (cfg.books==='cet6'||cfg.books==='both') ? cfg.books : 'cet4';
+  const daily = refineClampDaily(cfg.daily);
+  const ids = refinePoolIds(books).slice();
+  if(ids.length<4){ toast('词库还没有准备好'); return; }
+  shuffle(ids, Math.random);
+  const totalDays = Math.max(1, Math.ceil(ids.length/daily));
+  state.refine = {
+    books:books, daily:daily, ids:ids, totalDays:totalDays,
+    curDay:0, seen:{}, finished:false, createdAt:Date.now(), updatedAt:Date.now()
+  };
+  state.refineCfg = { books:books, daily:daily };
+  if(state.session && state.session.mode==='refine'){ state.session=null; S=null; }
+  save();
+  go('#/refine');
+  toast('精炼计划已开始 · '+refinePoolCount(books)+' 词');
+}
+function refineRestartPlan(){
+  const p=state.refine;
+  if(!p) return;
+  state.refineCfg={ books:p.books, daily:p.daily };
+  refineCreatePlan();
+}
+function refineLaunch(kind){
+  const cur = state.session;
+  if(cur && cur.qs && cur.qs.some(function(q){ return q.chosen<0; })){
+    const same = cur.mode==='refine' && state.refine && cur.refineDay===state.refine.curDay && cur.refineKind===kind;
+    if(!same){
+      const left = cur.qs.filter(function(q){ return q.chosen<0; }).length;
+      showDialog('当前还有未完成的练习', '「'+cur.label+'」还有 '+left+' 题没答完。开始这一组会替换掉那轮临时进度；已答过的单词记录、错题本都会保留。', '开始这一组', '先不开始', function(ok){
+        if(!ok) return;
+        state.session=null;
+        S=null;
+        save();
+        startRefine(kind);
+      });
+      return;
+    }
+  }
+  startRefine(kind);
+}
+
 function load(){
   try{
     const raw = localStorage.getItem(LS_KEY);
@@ -19249,7 +19701,8 @@ function load(){
     // 旧版题面用的是随机干扰项，临时进度作废（单词记录、错题本不受影响）
     if(state.session && state.session.ver!=='v4') state.session = null;
     rebuildCustomIndex();
-  }catch(e){ state = blankState(); }
+    refineNormalizeState();
+  }catch(e){ state = blankState(); refineNormalizeState(); }
 }
 function save(){
   try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
@@ -19286,11 +19739,12 @@ let S = (state.session && state.session.qs && state.session.qs.length) ? state.s
 let wordBack = '#/home';
 if(S && S.mode==='day' && !S.book){ S.book='cet4'; save(); }
 // 旧版本遗留的混合题型会话直接作废，词记录与错题本保留
-if(S && S.qs.some(function(q){ return q.t!=='en2cn'; })){ S=null; state.session=null; save(); }
+if(S && S.mode!=='refine' && S.qs.some(function(q){ return q.t!=='en2cn'; })){ S=null; state.session=null; save(); }
 if(S && (S.mode==='custom' || S.mode==='book') && S.qs.some(function(q){ return !WORDS[q.i]; })){ S=null; state.session=null; save(); }
-// 兼容旧会话：把已存选项文本里的原词/音标/词性就地清掉
+// 兼容旧会话：把已存选项文本里的原词/音标/词性就地清掉（精炼的选单词/拼写题不做这一步）
 if(S){
   S.qs.forEach(function(q){
+    if((q.t||'en2cn')!=='en2cn') return;
     (q.opts || []).forEach(function(o){
       if(o && typeof o.text==='string'){
         const wi = (typeof o.i==='number' && WORDS[o.i]) ? WORDS[o.i][0] : '';
@@ -19633,8 +20087,9 @@ function startSession(list, mode, day, label, pool, book){
 }
 
 /* 直接用现成的题目数组开局（辨析练习等） */
-function startQs(qs, mode, day, label){
+function startQs(qs, mode, day, label, extra){
   S = { mode:mode, day:day, label:label, qs:qs, pos:0, ts:Date.now(), ver:'v4' };
+  if(extra && typeof extra==='object'){ Object.keys(extra).forEach(function(k){ S[k]=extra[k]; }); }
   state.session = S;
   sheetOpen = false;
   exitSheetOpen = false;
@@ -19657,6 +20112,11 @@ function revertAnswer(q){
   q.prev = null;
 }
 
+function markRefineSeen(q){
+  if(!S || S.mode!=='refine' || !state.refine || !q) return;
+  const key = q.key || refineSeenKey(q.i, q.t);
+  if(key) state.refine.seen[key]=1;
+}
 function answerOption(o){
   if(!S) return;
   const q = S.qs[S.pos];
@@ -19677,6 +20137,33 @@ function answerOption(o){
   }
   state.words[q.i] = rec;
   q.prev = {ok:ok};
+  markRefineSeen(q);
+  beep(ok);
+  save(); render();
+}
+function answerFill(raw){
+  if(!S) return;
+  const q = S.qs[S.pos];
+  if(!q || q.chosen>=0) return;
+  const txt = String(raw==null?'':raw).trim();
+  if(!txt){ toast('先输入缺少的字母或完整单词'); return; }
+  const ok = refineFillCorrect(q, txt);
+  q.answerText = txt;
+  q.chosen = ok ? 0 : 1;
+  q.peek = null;
+  revertAnswer(q);
+  const rec = state.words[q.i] || {r:0,w:0,l:0};
+  if(ok){
+    rec.r=(rec.r||0)+1; rec.l=1;
+    delete state.wrong[q.i];
+  } else {
+    rec.w=(rec.w||0)+1; rec.l=-1;
+    const old = state.wrong[q.i] || {n:0};
+    state.wrong[q.i] = {n:(old.n||0)+1, t:Date.now(), pick:-1};
+  }
+  state.words[q.i] = rec;
+  q.prev = {ok:ok};
+  markRefineSeen(q);
   beep(ok);
   save(); render();
 }
@@ -19701,7 +20188,8 @@ function finish(){
     if(q.opts[q.chosen] && q.opts[q.chosen].ok) right++;
   });
   if(answered>0) state.dates[todayStr()] = 1;
-  const trophyDay = (typeof S.day==='number') ? S.day : -1;
+  const isRefine = S.mode==='refine';
+  const trophyDay = (!isRefine && typeof S.day==='number') ? S.day : -1;
   const trophyBook = S.book || planBookId();
   let unlocked = null;
   if(trophyDay>=0 && dayMastered(trophyDay, trophyBook) && !hasTrophy(trophyBook, trophyDay)){
@@ -19710,13 +20198,14 @@ function finish(){
   }
   lastResult = {
     mode:S.mode, day:S.day, book:trophyBook, right:right, total:qs.length, answered:answered, ms:Date.now()-S.ts,
-    trophy:unlocked,
+    trophy:unlocked, refineDay:S.refineDay, refineKind:S.refineKind,
     items:qs.map(function(q){
       return {i:q.i, answered:q.chosen>=0, ok:q.chosen>=0 && q.opts[q.chosen] && q.opts[q.chosen].ok};
     })
   };
   state.session = null;
   S = null;
+  if(isRefine) refineSync();
   sheetOpen = false;
   save();
   go('#/result');
@@ -20129,6 +20618,7 @@ function render(){
   else if(v==='fav'){ html = viewFav(); }
   else if(v==='lib'){ html = viewLib(); }
   else if(v==='plan'){ html = viewPlan(); }
+  else if(v==='refine'){ html = viewRefine(); }
   else if(v==='trophy'){ html = viewTrophy(); }
   else if(v==='word'){ html = viewWord(parseInt((location.hash.split('/')[2]||''),10)); }
   else if(v==='analysis'){ html = viewAnalysis(); }
@@ -20346,6 +20836,7 @@ function viewHome(){
   + '</button>'
   + '<div class="sect apps-sect">'
   +   '<div class="apps-h"><h2>学习应用</h2><span>点单词本图标切换计划</span></div>'
+  +   refineEntryHtml()
   +   '<div class="appgrid">'
   +     '<button class="appic" data-act="homeWidget" data-w="planbook" title="点击选择单词本">'
   +       '<span class="appglyph plan">'+ICON.grid+'<span class="appbadge">'+doneDays+'/'+D+'</span></span>'
@@ -20398,6 +20889,174 @@ function viewPlan(){
 }
 
 /* ============================================================
+   视图：精炼（新学 + 次日滚动复习）
+   ============================================================ */
+function refineEntryHtml(){
+  const p = state.refine;
+  let side='制定计划', sub='选单词本与每日新词量';
+  if(p){
+    sub = refineBookLabel(p.books)+' · 每天 '+p.daily+' 新词 · 次日复习';
+    if(p.finished) side='已完成';
+    else if(state.session && state.session.mode==='refine') side='继续';
+    else side='Day '+(p.curDay+1)+' / '+p.totalDays;
+  }
+  return '<button class="rf-entry" data-act="nav" data-v="#/refine">'
+    + '<span class="ic">'+ICON.refine+'</span>'
+    + '<span class="tx"><b>精炼</b><small>'+esc(sub)+'</small></span>'
+    + '<span class="side">'+esc(side)+'</span></button>';
+}
+function refineConfigHtml(){
+  const cfg = state.refineCfg;
+  const daily = refineClampDaily(cfg.daily);
+  const count = refinePoolCount(cfg.books);
+  const days = Math.max(1, Math.ceil(count/daily));
+  const presets = [10,20,30,50,80];
+  return ''
+  + '<div class="rf-config">'
+  +   '<div class="panel rf-intro">'
+  +     '<div class="rf-kicker">REFINE</div>'
+  +     '<h2>每天一点，隔天回看</h2>'
+  +     '<p>选一本或两本全练，按每日新词量切成计划。每个词先学一次，第二天换一种题型复习；同一道题在计划里不会重复。</p>'
+  +   '</div>'
+  +   '<div class="panel">'
+  +     '<div class="rf-block">'
+  +       '<div class="rf-label"><b>练哪本</b><span>两本全练会去重</span></div>'
+  +       '<div class="rf-books">'
+  +         '<button class="rf-book'+(cfg.books==='cet4'?' on':'')+'" data-act="refineBook" data-b="cet4"><b>四级</b><span>'+N+' 词</span></button>'
+  +         '<button class="rf-book'+(cfg.books==='cet6'?' on':'')+'" data-act="refineBook" data-b="cet6"><b>六级</b><span>'+CET6_IDS.length+' 词</span></button>'
+  +         '<button class="rf-book'+(cfg.books==='both'?' on':'')+'" data-act="refineBook" data-b="both"><b>两本全练</b><span>'+libAllIds().length+' 词</span></button>'
+  +       '</div>'
+  +     '</div>'
+  +     '<div class="rf-block">'
+  +       '<div class="rf-label"><b>每天新词</b><span>不包含复习</span></div>'
+  +       '<div class="rf-daily">'
+  +         '<button class="rf-step" data-act="refineDailyMinus" aria-label="减少">−</button>'
+  +         '<b>'+daily+'</b><span>词 / 天</span>'
+  +         '<button class="rf-step" data-act="refineDailyPlus" aria-label="增加">＋</button>'
+  +       '</div>'
+  +       '<div class="rf-presets">'+presets.map(function(n){
+              return '<button class="rf-preset'+(daily===n?' on':'')+'" data-act="refineDailyChip" data-n="'+n+'">'+n+'</button>';
+            }).join('')+'</div>'
+  +     '</div>'
+  +     '<div class="rf-summary">'+esc(refineBookLabel(cfg.books))+' · '+count+' 词 · 约 '+days+' 天 · 每天 '+daily+' 新词 + 次日复习。Day 1 只有新词，Day 2 开始新学与滚动复习分别入口。</div>'
+  +     '<button class="primary rf-create" data-act="refineCreate">制定精炼计划</button>'
+  +   '</div>'
+  + '</div>';
+}
+function refineDoneHtml(p){
+  const doneDays = p.totalDays;
+  return ''
+  + '<div class="rf-hero panel">'
+  +   '<div class="rf-hero-top"><span>PLAN COMPLETE</span><em>'+doneDays+' / '+p.totalDays+' 天</em></div>'
+  +   '<h2>这一轮精炼完成了</h2>'
+  +   '<p>'+esc(refineBookLabel(p.books))+' · '+p.ids.length+' 词，每个词都走过新学和次日复习，同一道题没有重复。</p>'
+  +   '<div class="rf-stats">'
+  +     '<div class="rf-stat"><b>'+p.ids.length+'</b><span>计划总词</span></div>'
+  +     '<div class="rf-stat"><b>'+p.totalDays+'</b><span>完成天数</span></div>'
+  +     '<div class="rf-stat"><b>'+p.daily+'</b><span>每天新词</span></div>'
+  +   '</div>'
+  + '</div>'
+  + '<button class="primary" data-act="refineRestart" style="width:100%">再来一轮 · 重新打乱</button>'
+  + '<div class="btnrow rf-bottom"><button class="ghost" data-act="refineReplan" style="width:100%">重新选单词本和每日词汇量</button></div>';
+}
+function refineDashboardHtml(){
+  const p = state.refine;
+  if(!p) return refineConfigHtml();
+  if(p.finished) return refineDoneHtml(p);
+  const day = p.curDay;
+  const newIds = refineNewIds(p,day);
+  const reviewIds = refineReviewIds(p,day);
+  const newDone = refineNewDone(p,day);
+  const reviewDone = refineReviewDone(p,day);
+  const learned = refineDoneWordCount(p);
+  const pct = Math.round(learned*100/Math.max(1,p.ids.length));
+  const doneDays = refineDoneDays(p);
+  const reviewPending = reviewDone ? 0 : reviewIds.length;
+  const active = state.session && state.session.mode==='refine' ? state.session : null;
+
+  let activeHtml='';
+  if(active){
+    activeHtml = '<button class="continue" data-act="refineResume">'
+      + '<div><div class="lbl">CONTINUE</div><div class="big">继续 '+esc(active.label)+' · 第 '+(active.pos+1)+'/'+active.qs.length+' 题</div>'
+      + '<div class="meta">上次进度已保存，接着练</div></div>'
+      + '<span class="go"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span></button>';
+  }
+
+  const newActive = active && active.refineDay===day && active.refineKind==='new';
+  const reviewActive = active && active.refineDay===day && active.refineKind==='review';
+
+  let newCard;
+  if(newActive){
+    newCard = '<button class="continue" data-act="refineStartNew">'
+      + '<div><div class="lbl">NEW WORDS · CONTINUE</div><div class="big">继续 Day '+(day+1)+' 新词 · 第 '+(active.pos+1)+'/'+active.qs.length+' 题</div>'
+      + '<div class="meta">三种题型随机出现</div></div>'
+      + '<span class="go"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span></button>';
+  } else if(newDone){
+    newCard = '<div class="rf-done"><span class="ic">✓</span><span class="tx"><b>今天的新词已完成</b><span>'+newIds.length+' 个词已经学过</span></span></div>';
+  } else {
+    newCard = '<button class="continue" data-act="refineStartNew">'
+      + '<div><div class="lbl">NEW WORDS</div><div class="big">Day '+(day+1)+' 新词 · '+newIds.length+' 词</div>'
+      + '<div class="meta">单词选汉语 / 汉语选单词 / 补拼写</div></div>'
+      + '<span class="go"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span></button>';
+  }
+
+  let reviewCard;
+  if(day<=0){
+    reviewCard = '<div class="rf-note">Day 1 只学新词。第二天开始，这里会出现昨天的词做滚动复习。</div>';
+  } else if(reviewActive){
+    reviewCard = '<button class="continue rf-review" data-act="refineStartReview">'
+      + '<div><div class="lbl">REVIEW · CONTINUE</div><div class="big">继续 Day '+(day+1)+' 复习 · 第 '+(active.pos+1)+'/'+active.qs.length+' 题</div>'
+      + '<div class="meta">换一种题型回看昨天的词</div></div>'
+      + '<span class="go"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span></button>';
+  } else if(reviewDone){
+    reviewCard = '<div class="rf-done"><span class="ic">✓</span><span class="tx"><b>今天的滚动复习已完成</b><span>'+reviewIds.length+' 个昨天的词已经回看</span></span></div>';
+  } else {
+    reviewCard = '<button class="continue rf-review" data-act="refineStartReview">'
+      + '<div><div class="lbl">REVIEW</div><div class="big">滚动复习 · '+reviewIds.length+' 词</div>'
+      + '<div class="meta">昨天学过的词 · 换一种题型 · 不重复原题</div></div>'
+      + '<span class="go"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span></button>';
+  }
+
+  return ''
+  + '<div class="rf-hero panel">'
+  +   '<div class="rf-hero-top"><span>DAY '+(day+1)+' / '+p.totalDays+'</span><em>已学 '+learned+' / '+p.ids.length+'</em></div>'
+  +   '<h2>今天 <b>'+newIds.length+'</b> 个新词'+(reviewIds.length?' + '+reviewIds.length+' 个复习':'')+'</h2>'
+  +   '<p>'+esc(refineBookLabel(p.books))+' · 每天 '+p.daily+' 新词 · 已完成 '+doneDays+' 天</p>'
+  +   '<div class="rf-stats">'
+  +     '<div class="rf-stat"><b>'+newIds.length+'</b><span>Day '+(day+1)+' 新词</span></div>'
+  +     '<div class="rf-stat"><b>'+reviewPending+'</b><span>待滚动复习</span></div>'
+  +     '<div class="rf-stat"><b>'+p.ids.length+'</b><span>计划总词</span></div>'
+  +   '</div>'
+  +   '<div class="progress rf-progress"><i style="width:'+Math.min(100,Math.max(pct,1))+'%"></i></div>'
+  + '</div>'
+  + activeHtml
+  + (activeHtml?'<div class="rf-section-h"><b>今日任务</b><span>可以分开做</span></div>':'')
+  + newCard
+  + '<div style="height:9px"></div>'
+  + reviewCard
+  + '<div class="rf-note">第一天学新词，第二天滚动复习昨天的词。新学和复习是两组独立题目，同一个词在计划内最多出现两次，且题型不同。</div>'
+  + '<div class="btnrow rf-bottom"><button class="ghost" data-act="refineReplan" style="width:100%">重新制定计划</button></div>';
+}
+function viewRefine(){
+  if(!(S && S.mode==='refine')) refineSync();
+  const p = state.refine;
+  let sub = '新学 + 次日滚动复习';
+  if(p){
+    sub = refineBookLabel(p.books)+' · 每天 '+p.daily+' 新词';
+    if(p.finished) sub += ' · 已完成';
+  }
+  return ''
+  + '<div class="topbar">'
+  +   '<button class="iconbtn" data-act="nav" data-v="#/home" title="返回首页">'+ICON.back+'</button>'
+  +   '<div class="topmid"><div class="t">精炼</div><div class="s">'+esc(sub)+'</div></div>'
+  +   '<button class="modetoggle" data-act="toggleTheme" title="切换白天 / 夜间">'
+  +     (state.settings.theme==='dark' ? ICON.moon+'夜间护眼' : ICON.sun+'白天')
+  +   '</button>'
+  + '</div>'
+  + '<div class="rf-page">'+(p ? refineDashboardHtml() : refineConfigHtml())+'</div>';
+}
+
+/* ============================================================
    视图：奖杯收藏（从首页 App 图标进入）
    ============================================================ */
 function viewTrophy(){
@@ -20428,6 +21087,7 @@ let voiceSheetOpen = false;
 let exitSheetOpen = false;
 
 function viewQuiz(){
+  if(!S) return viewHome();
   const q = S.qs[S.pos];
   if(!q){ return viewHome(); }
   const it = WORDS[q.i];
@@ -20438,34 +21098,57 @@ function viewQuiz(){
   const pct = Math.round(S.pos*100/total);
   const left = S.qs.filter(function(x){ return x.chosen<0; }).length;
 
-  let prompt = (tagFor(q.i)?'<div class="qtag">'+tagChip(q.i)+'</div>':'')
+  let prompt;
+  if(q.t==='cn2en'){
+    prompt = (tagFor(q.i)?'<div class="qtag">'+tagChip(q.i)+'</div>':'')
+           + '<div class="rf-prompt-cn'+(cn.length>14?' rf-prompt-long':'')+'">'+esc(cn)+'</div>'
+           + '<div class="rf-prompt-sub"><span class="posbadge">'+esc(pos)+'</span><span class="rf-tip">选出对应的英文单词</span></div>';
+  } else if(q.t==='fill'){
+    prompt = (tagFor(q.i)?'<div class="qtag">'+tagChip(q.i)+'</div>':'')
+           + '<div class="rf-prompt-cn'+(cn.length>14?' rf-prompt-long':'')+'">'+esc(cn)+'</div>'
+           + '<div class="rf-maskline">'+refineMaskHtml(q.mask || w)+'</div>'
+           + '<div class="rf-prompt-sub"><span class="posbadge">'+esc(pos)+'</span><span class="rf-tip">补全横线，也可以直接输入整词</span></div>';
+  } else {
+    prompt = (tagFor(q.i)?'<div class="qtag">'+tagChip(q.i)+'</div>':'')
              + '<div class="word serif">'+esc(w)+'</div>'
              + '<div class="phon">'+(ph?'<span class="serif">/'+esc(ph)+'/</span>':'')
              + '<button class="iconbtn plain" data-act="speak" data-w="'+esc(w)+'" title="朗读">'+ICON.sound+'</button>'
              + ydLink(w) + '</div>';
+  }
 
   let opts='';
-  q.opts.forEach(function(o, idx){
-    let cls='opt';
-    if(answered){
-      cls+=' locked';
-      if(o.ok) cls+=' right';
-      else if(q.chosen===idx) cls+=' wrong';
-      else cls+=' dim';
-    }
-    const opos = o.pos || ((typeof o.i === 'number' && WORDS[o.i]) ? WORDS[o.i][2] : '');
-    const otxt = cleanDef(o.text, (typeof o.i==='number' && WORDS[o.i]) ? WORDS[o.i][0] : '');
-    opts += '<button class="'+cls+'" data-act="answer" data-o="'+idx+'">'
-          + '<span class="key">'+String.fromCharCode(65+idx)+'</span>'
-          + (opos ? '<span class="pos">'+esc(opos)+'</span>' : '')
-          + '<span class="txt">'+esc(otxt)+'</span>'
-          + ((answered && typeof o.i==='number' && WORDS[o.i]) ? '<span class="oc" data-act="wordcard" data-i="'+o.i+'" title="打开单词卡">'+ICON.book+'</span>' : '')
-          + '</button>';
-  });
+  if(q.t!=='fill'){
+    q.opts.forEach(function(o, idx){
+      let cls='opt';
+      if(answered){
+        cls+=' locked';
+        if(o.ok) cls+=' right';
+        else if(q.chosen===idx) cls+=' wrong';
+        else cls+=' dim';
+      }
+      const opos = o.pos || ((typeof o.i === 'number' && WORDS[o.i]) ? WORDS[o.i][2] : '');
+      const isEnOpt = q.t==='cn2en';
+      const otxt = isEnOpt ? String(o.text||'') : cleanDef(o.text, (typeof o.i==='number' && WORDS[o.i]) ? WORDS[o.i][0] : '');
+      opts += '<button class="'+cls+'" data-act="answer" data-o="'+idx+'">'
+            + '<span class="key">'+String.fromCharCode(65+idx)+'</span>'
+            + (opos ? '<span class="pos">'+esc(opos)+'</span>' : '')
+            + '<span class="txt'+(isEnOpt?' serif':'')+'">'+esc(otxt)+'</span>'
+            + ((answered && typeof o.i==='number' && WORDS[o.i]) ? '<span class="oc" data-act="wordcard" data-i="'+o.i+'" title="打开单词卡">'+ICON.book+'</span>' : '')
+            + '</button>';
+    });
+  }
+  let fillPanel='';
+  if(q.t==='fill'){
+    fillPanel = '<div class="rf-fillbox">'
+      + (answered
+          ? '<div class="rf-fill-result '+(q.chosen===0?'ok':'no')+'">你写的是 <b>'+esc(q.answerText||'（空）')+'</b></div>'
+          : '<div class="rf-fill-form"><input id="fillInput" class="rf-fill-input" data-role="fill" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="输入缺少的字母，或直接输入完整单词" value="'+esc(q.draft||'')+'" autofocus><button class="primary" data-act="fillSubmit">提交</button></div>')
+      + '</div>';
+  }
 
   /* 已答完后，点其他选项可以看它对应哪个单词 */
   let peekHtml='';
-  if(answered && typeof q.peek==='number' && q.opts[q.peek]){
+  if(q.t!=='fill' && answered && typeof q.peek==='number' && q.opts[q.peek]){
     const pk=(typeof q.opts[q.peek].i==='number' && WORDS[q.opts[q.peek].i]) ? WORDS[q.opts[q.peek].i] : null;
     if(pk){
       peekHtml = '<div class="peek"><span class="k">选项 '+String.fromCharCode(65+q.peek)+' 对应</span>'
@@ -20483,7 +21166,10 @@ function viewQuiz(){
   if(answered){
     const ok = !!(q.opts[q.chosen] && q.opts[q.chosen].ok);
     const chosenOpt = q.opts[q.chosen] || {};
-    const chosenTxt = cleanDef(chosenOpt.text || '', (typeof chosenOpt.i==='number' && WORDS[chosenOpt.i]) ? WORDS[chosenOpt.i][0] : '');
+    let chosenTxt = '';
+    if(q.t==='fill') chosenTxt = q.answerText || '';
+    else if(q.t==='cn2en') chosenTxt = String(chosenOpt.text||'');
+    else chosenTxt = cleanDef(chosenOpt.text || '', (typeof chosenOpt.i==='number' && WORDS[chosenOpt.i]) ? WORDS[chosenOpt.i][0] : '');
     const antAll = antOf(q.i);
     const antList = antAll.slice(0,3);
     const famList = famOf(q.i).filter(function(j){ return antAll.indexOf(j)<0; }).slice(0,5);
@@ -20502,8 +21188,8 @@ function viewQuiz(){
     const pickW = (q.opts[q.chosen] || {}).i;
     const pickIt = (typeof pickW === 'number' && WORDS[pickW]) ? WORDS[pickW] : null;
     let aiHint = '';
-    if(!ok) aiHint = wrongDiagHtml(q.i, pickW);
-    const pickWordHtml = (!ok && pickIt)
+    if(!ok && q.t!=='fill') aiHint = wrongDiagHtml(q.i, pickW);
+    const pickWordHtml = (q.t!=='fill' && !ok && pickIt)
       ? '<div class="exp-pick-word"><span class="k">你选中的这个词</span>'
         + '<b>'+esc(pickIt[0])+'</b><span class="phx">/'+esc(pickIt[1])+'/</span>'
         + '<span class="posbadge">'+esc(pickIt[2])+'</span>'+esc(cleanDef(pickIt[3], pickIt[0]))
@@ -20520,7 +21206,7 @@ function viewQuiz(){
       +   '<button class="minilink" data-act="wordcard" data-i="'+q.i+'">单词卡</button>'
       + '</div>'
       + '<div class="exp-cn"><span class="posbadge">'+esc(pos)+'</span>'+esc(cn)+'</div>'
-      + (ok ? '' : '<div class="exp-pick">你选的是：<s>'+esc(chosenTxt)+'</s></div>' + pickWordHtml)
+      + (ok ? '' : '<div class="exp-pick">'+(q.t==='fill'?'你写的是：':'你选的是：')+'<s>'+esc(chosenTxt||'（未作答）')+'</s></div>' + pickWordHtml)
       + aiHint
       + '<div class="exp-fam"><b>'+(root>=0?'词族 · 同根词':'派生词')+'</b>'+fam+'</div>'
       + '<button class="redo" data-act="redo">重做本题</button>'
@@ -20578,12 +21264,12 @@ function viewQuiz(){
   +     '<button class="starbtn '+(state.fav[q.i]?'on':'')+'" data-act="fav" data-i="'+q.i+'" title="收藏">'+(state.fav[q.i]?ICON.starOn:ICON.star)+'</button>'
   +   '</div>'
   +   '<div class="prompt">'+prompt+'</div>'
-  +   '<div class="opts">'+opts+'</div>'
-  +   (answered ? '<div class="opts-note">点任一选项，可查看它对应哪个单词</div>' : '')
+  +   (q.t==='fill' ? fillPanel : '<div class="opts">'+opts+'</div>')
+  +   ((answered && q.t!=='fill') ? '<div class="opts-note">点任一选项，可查看它对应哪个单词</div>' : '')
   +   peekHtml
   + '</div>'
   + explain
-  + '<div class="kbd-hint">按 1–4 选择 · ← → 前后翻题 · Enter 下一题</div>'
+  + '<div class="kbd-hint">'+(q.t==='fill'?'输入后按 Enter 提交 · ← → 前后翻题':'按 1–4 选择 · ← → 前后翻题 · Enter 下一题')+'</div>'
   + sheet + exitSheet;
 }
 
@@ -20593,6 +21279,7 @@ function viewQuiz(){
 function viewResult(){
   const r = lastResult;
   const book = r.book || planBookId();
+  const isRefine = r.mode==='refine';
   const answered = r.answered || 0;
   const pct = answered ? Math.round(r.right*100/answered) : 0;
   const wrongItems = r.items.filter(function(x){ return x.answered && !x.ok; });
@@ -20616,8 +21303,8 @@ function viewResult(){
 
   return ''
   + '<div class="topbar">'
-  +   '<button class="iconbtn" data-act="home" title="返回首页">'+ICON.back+'</button>'
-  +   '<div class="topmid"><div class="t">'+(r.mode==='day'?(planBookLabelFor(book)+' Day '+(r.day+1)+' 结果'):'练习结果')+'</div><div class="s">用时 '+fmtTime(r.ms)+'</div></div>'
+  +   '<button class="iconbtn" data-act="'+(isRefine?'nav':'home')+'"'+(isRefine?' data-v="#/refine"':'')+' title="返回">'+ICON.back+'</button>'
+  +   '<div class="topmid"><div class="t">'+(isRefine?('精炼 Day '+((r.refineDay||0)+1)+' · '+(r.refineKind==='review'?'复习':'新词')+'结果'):(r.mode==='day'?(planBookLabelFor(book)+' Day '+(r.day+1)+' 结果'):'练习结果'))+'</div><div class="s">用时 '+fmtTime(r.ms)+'</div></div>'
   +   '<div class="clock">连续 '+streak+' 天</div>'
   + '</div>'
   + '<div class="hero">'
@@ -20627,12 +21314,16 @@ function viewResult(){
   + '</div>'
   + trophyHtml
   + '<div class="qfoot" style="margin-top:14px">'
-  +   (skippedItems.length ? '<button class="primary" data-act="retrySkip">继续未答（'+skippedItems.length+'）</button>' : '')
-  +   (wrongItems.length ? '<button class="'+(skippedItems.length?'ghost':'primary')+'" data-act="retry">重练错题（'+wrongItems.length+'）</button>' : '')
-  +   '<button class="ghost" data-act="home">返回首页</button>'
+  +   (isRefine
+      ? '<button class="primary" data-act="nav" data-v="#/refine">返回精炼</button><button class="ghost" data-act="home">返回首页</button>'
+      : ((skippedItems.length ? '<button class="primary" data-act="retrySkip">继续未答（'+skippedItems.length+'）</button>' : '')
+        + (wrongItems.length ? '<button class="'+(skippedItems.length?'ghost':'primary')+'" data-act="retry">重练错题（'+wrongItems.length+'）</button>' : '')
+        + '<button class="ghost" data-act="home">返回首页</button>'))
   + '</div>'
   + '<div class="panel"><h3>错题回顾</h3>'+wrongHtml+'</div>'
-  + (skippedItems.length ? '<div class="note">还有 '+skippedItems.length+' 题没作答，点“继续未答”可以直接接着做；未答的词不算答错，也不会进错题本。</div>' : '<div class="note">答错的词答完就即时收进错题本了，之后什么时候答对都会自动移出。</div>');
+  + (isRefine
+      ? '<div class="note">精炼结果已记入学习记录；未答的词不会算作已学，回到精炼页可以继续补完这一组。</div>'
+      : (skippedItems.length ? '<div class="note">还有 '+skippedItems.length+' 题没作答，点“继续未答”可以直接接着做；未答的词不算答错，也不会进错题本。</div>' : '<div class="note">答错的词答完就即时收进错题本了，之后什么时候答对都会自动移出。</div>'));
 }
 
 /* ============================================================
@@ -22191,6 +22882,7 @@ function applyImportedState(s){
   state.coach = Array.isArray(state.coach) ? state.coach : [];
   if(!Array.isArray(state.customBooks)) state.customBooks=[];
   if(typeof state.customSeq!=='number' || state.customSeq<CUSTOM_BASE) state.customSeq=CUSTOM_BASE;
+  refineNormalizeState();
   state.session = null;
   S = null; lastResult = null;
   DAY_CACHE = {};
@@ -22267,6 +22959,43 @@ document.addEventListener('click', function(e){
     const href = el.getAttribute('data-v');
     if(bar){ selectTab(bar, href); return; }
     go(href);
+    return;
+  }
+  if(act==='refineBook'){
+    const b = el.getAttribute('data-b');
+    if(b!=='cet4' && b!=='cet6' && b!=='both') return;
+    state.refineCfg.books=b;
+    save(); render(); return;
+  }
+  if(act==='refineDailyMinus' || act==='refineDailyPlus'){
+    const delta = act==='refineDailyMinus' ? -5 : 5;
+    state.refineCfg.daily = refineClampDaily(state.refineCfg.daily + delta);
+    save(); render(); return;
+  }
+  if(act==='refineDailyChip'){
+    state.refineCfg.daily = refineClampDaily(parseInt(el.getAttribute('data-n'),10));
+    save(); render(); return;
+  }
+  if(act==='refineCreate'){ refineCreatePlan(); return; }
+  if(act==='refineStartNew'){ refineLaunch('new'); return; }
+  if(act==='refineStartReview'){ refineLaunch('review'); return; }
+  if(act==='refineResume'){
+    if(state.session && state.session.mode==='refine'){ S=state.session; go('#/quiz'); }
+    return;
+  }
+  if(act==='refineRestart'){ refineRestartPlan(); return; }
+  if(act==='refineReplan'){
+    const p=state.refine;
+    const msg = p
+      ? ('当前计划：'+refineBookLabel(p.books)+' · '+p.daily+' 新词/天 · Day '+(p.curDay+1)+' / '+p.totalDays+'。\n重新制定会清空这一轮精炼进度，单词记录和错题本保留。')
+      : '重新选择单词本和每日新词量。';
+    showDialog('重新制定精炼计划？', msg, '重新制定', '取消', function(ok){
+      if(!ok) return;
+      if(p) state.refineCfg={ books:p.books, daily:p.daily };
+      state.refine=null;
+      if(state.session && state.session.mode==='refine'){ state.session=null; S=null; }
+      save(); go('#/refine'); render();
+    });
     return;
   }
   if(act==='homeSearch'){
@@ -22377,11 +23106,12 @@ document.addEventListener('click', function(e){
   }
   if(act==='exitQuiz'){ exitSheetOpen=true; sheetOpen=false; render(); return; }
   if(act==='exitCancel'){ exitSheetOpen=false; render(); return; }
-  if(act==='exitSave'){ exitSheetOpen=false; save(); go('#/home'); return; }
+  if(act==='exitSave'){ exitSheetOpen=false; const back=(S && S.mode==='refine')?'#/refine':'#/home'; save(); go(back); return; }
   if(act==='exitDrop'){
+    const isRf = !!(S && S.mode==='refine');
     showDialog('放弃这一轮的临时进度？', '已答过的单词记录、错题本不会受影响，只是下次重新打乱开始。', '放弃进度', '再想想', function(ok){
       if(!ok) return;
-      state.session=null; S=null; exitSheetOpen=false; save(); go('#/home');
+      state.session=null; S=null; exitSheetOpen=false; save(); go(isRf?'#/refine':'#/home');
     });
     return;
   }
@@ -22397,7 +23127,11 @@ document.addEventListener('click', function(e){
   if(act==='redo'){
     if(!S) return;
     const q = S.qs[S.pos];
-    if(q){ revertAnswer(q); q.chosen=-1; q.peek=null; save(); render(); }
+    if(q){
+      revertAnswer(q); q.chosen=-1; q.peek=null;
+      if(q.t==='fill'){ q.draft=''; q.answerText=''; }
+      save(); render();
+    }
     return;
   }
   if(act==='finish'){ if(S){ sheetOpen=false; finish(); } return; }
@@ -22418,6 +23152,12 @@ document.addEventListener('click', function(e){
       return;
     }
     answerOption(oi); return;
+  }
+  if(act==='fillSubmit'){
+    if(!S) return;
+    const inp=document.getElementById('fillInput');
+    answerFill(inp ? inp.value : '');
+    return;
   }
   if(act==='confuse'){ startConfuse(); return; }
   if(act==='next'){ nextQuestion(); return; }
@@ -22568,6 +23308,13 @@ document.addEventListener('click', function(e){
 
 document.addEventListener('input', function(e){
   const el=e.target;
+  if(el && el.id==='fillInput'){
+    if(S){
+      const q=S.qs[S.pos];
+      if(q && q.t==='fill'){ q.draft=el.value; save(); }
+    }
+    return;
+  }
   if(el.getAttribute && el.getAttribute('data-role')==='libq'){
     lib.q = el.value; lib.limit=120;
     if(lib.letter!=='ALL'){
@@ -22634,6 +23381,25 @@ document.addEventListener('keydown', function(e){
   if(location.hash.indexOf('#/quiz')!==0 || !S) return;
   if(sheetOpen){
     if(e.key==='Escape'){ sheetOpen=false; render(); e.preventDefault(); }
+    return;
+  }
+  const q0 = S.qs[S.pos];
+  if(q0 && q0.t==='fill'){
+    if(e.target && e.target.id==='fillInput'){
+      if(e.key==='Enter'){
+        e.preventDefault();
+        if(q0.chosen>=0) nextQuestion(); else answerFill(e.target.value);
+      }
+      return;
+    }
+    if(e.key==='Enter'){
+      e.preventDefault();
+      if(q0.chosen>=0) nextQuestion();
+      return;
+    }
+    if(e.key==='ArrowLeft' && S.pos>0){ S.pos--; save(); render(); e.preventDefault(); return; }
+    if(e.key==='ArrowRight' && S.pos<S.qs.length-1){ S.pos++; save(); render(); e.preventDefault(); return; }
+    if(/^[1-4]$/.test(e.key)) e.preventDefault();
     return;
   }
   if(e.key>='1' && e.key<='4'){
