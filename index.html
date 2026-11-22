@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>单词大师 · 四级 / 六级</title>
 <meta name="application-name" content="单词大师">
-<meta name="app-version" content="2026.11.22.13">
+<meta name="app-version" content="2026.11.22.14">
 <meta name="app-build-date" content="2026-11-22">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23007AFF'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='19' font-weight='600' fill='%23FFFFFF' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
 <style>
@@ -19146,7 +19146,7 @@ const EXAMPLES = {"abandon":[["v.",[["He claimed that his parents had abandoned 
    ============================================================ */
 const N = WORDS.length;
 const LS_KEY = 'cet4vocab_20d_v1';
-const APP_VERSION = '2026.11.22.13';
+const APP_VERSION = '2026.11.22.14';
 const APP_VERSION_DATE = '2026-11-22';
 const UPDATE_DEFAULT_SRC = 'https://zhaowenhan371-blip.github.io/word-master/update.json';
 let updateFound = null;
@@ -19193,6 +19193,7 @@ const ICON = {
   sun   : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.5 5.5l1.6 1.6M16.9 16.9l1.6 1.6M18.5 5.5l-1.6 1.6M7.1 16.9L5.5 18.5"/></svg>',
   moon  : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M20 14.5A8.2 8.2 0 019.5 4 8.5 8.5 0 1020 14.5z"/></svg>',
   grid  : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="4" y="4" width="6" height="6" rx="1.4"/><rect x="14" y="4" width="6" height="6" rx="1.4"/><rect x="4" y="14" width="6" height="6" rx="1.4"/><rect x="14" y="14" width="6" height="6" rx="1.4"/></svg>',
+  down  : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 4v10"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg>',
   trash : '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
   chart : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5M12.5 16V8M17 16v-3"/></svg>',
   search: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.2"/><path d="M15.5 15.5l4.2 4.2"/></svg>',
@@ -19322,6 +19323,7 @@ function blankState(){
     settings:{ days:20, sound:0, theme:'light', voice:'', audio:'online', accent:'us', wallpaper:'', wallTone:'', updateUrl:'' },
     words:{}, wrong:{}, fav:{}, days:{}, dates:{}, trophies:{}, session:null, coach:[], planBook:'cet4',
     customBooks:[], customSeq:100000,
+    coachCfg:{ style:'direct', length:'normal', autoData:1, autoDiag:1, allowAutoAnswer:1, speakReply:0, nextStep:1, exportScope:'all' },
     refine:null, refineCfg:{ books:'cet4', daily:30 }
   };
 }
@@ -19754,6 +19756,7 @@ function load(){
     const base = blankState();
     state = Object.assign(base, s);
     state.settings = Object.assign(base.settings, s.settings || {});
+    state.coachCfg = Object.assign({}, base.coachCfg, s.coachCfg || {});
     if(!state.words || typeof state.words!=='object') state.words={};
     if(!state.wrong || typeof state.wrong!=='object') state.wrong={};
     if(!state.fav || typeof state.fav!=='object') state.fav={};
@@ -20827,6 +20830,7 @@ function render(){
   else if(v==='trophy'){ html = viewTrophy(); }
   else if(v==='word'){ html = viewWord(parseInt((location.hash.split('/')[2]||''),10)); }
   else if(v==='analysis'){ html = viewAnalysis(); }
+  else if(v==='coachset'){ html = viewCoachSettings(); }
   else if(v==='settings'){ html = viewSettings(); }
   else { html = viewHome(); }
   const withTabs = ['home','lib','wrong','analysis','settings'].indexOf(v) >= 0;
@@ -21356,6 +21360,7 @@ function viewPaperQuiz(){
     +   '<button class="iconbtn" data-act="exitQuiz" title="退出">'+ICON.back+'</button>'
     +   '<div class="topmid"><div class="t">'+esc(S.label||'导入题目')+'</div><div class="s">第 '+(S.pos+1)+' / '+total+' 题'+(left?' · 未答 '+left:'')+'</div></div>'
     +   '<button class="iconbtn" data-act="sheet" title="答题卡">'+ICON.grid+'</button>'
+    +   '<button class="iconbtn" data-act="exportSession" title="导出全部题目">'+ICON.down+'</button>'
     +   '<div class="clock" id="clock">'+fmtTime(Date.now()-S.ts)+'</div>'
     + '</div>'
     + '<div class="progress"><i style="width:'+Math.max(pct,1)+'%"></i></div>'
@@ -21574,6 +21579,7 @@ function viewQuiz(){
   +   '<button class="iconbtn" data-act="exitQuiz" title="退出">'+ICON.back+'</button>'
   +   '<div class="topmid"><div class="t">'+esc(S.label)+'</div><div class="s">第 '+(S.pos+1)+' / '+total+' 题'+(left?' · 未答 '+left:'')+'</div></div>'
   +   '<button class="iconbtn" data-act="sheet" title="答题卡">'+ICON.grid+'</button>'
+  +   '<button class="iconbtn" data-act="exportSession" title="导出全部题目">'+ICON.down+'</button>'
   +   '<div class="clock" id="clock">'+fmtTime(Date.now()-S.ts)+'</div>'
   + '</div>'
   + '<div class="progress"><i style="width:'+Math.max(pct,1)+'%"></i></div>'
@@ -22395,6 +22401,32 @@ function coachReply(q, file){
    DeepSeek API：只从本机读取配置，Key 不写进页面和导出文件
    ============================================================ */
 function deepseekReady(){ return !!(DEEPSEEK.key && DEEPSEEK.model && DEEPSEEK.endpoint); }
+function coachCfgGet(){
+  return Object.assign({ style:'direct', length:'normal', autoData:1, autoDiag:1, allowAutoAnswer:1, speakReply:0, nextStep:1, exportScope:'all' }, state.coachCfg || {});
+}
+function coachCfgToggle(k){
+  const c = coachCfgGet();
+  state.coachCfg = Object.assign({}, c);
+  state.coachCfg[k] = c[k] ? 0 : 1;
+  save(); render();
+}
+function coachCfgSet(k, v){
+  const c = coachCfgGet();
+  state.coachCfg = Object.assign({}, c);
+  state.coachCfg[k] = v;
+  save(); render();
+}
+function coachQuickSay(text){
+  if(!coachCfgGet().speakReply) return;
+  try{
+    if(!window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance(String(text||'').replace(/[#*]/g,'').slice(0,400));
+    u.lang = 'zh-CN';
+    u.rate = 1.02;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
 function matchWordInQuery(q){
   const m = q.match(/[A-Za-z][A-Za-z'\-]*/);
   if(!m) return -1;
@@ -22403,22 +22435,24 @@ function matchWordInQuery(q){
   for(let i=0;i<N;i++){ if(WORDS[i][0].toLowerCase().indexOf(token)===0) return i; }
   return -1;
 }
-function deepseekContext(q){
+function deepseekContext(q, withWrong){
   const st = coachCauseStats();
   const studied = studiedInBook(planBookId());
   const acc = accuracyAll();
   const lines = [
-    '当前每日计划：'+planBookLabel()+'，已学 '+studied+'/'+planIds().length+'，正确率 '+acc+'%，错题 '+st.list.length+' 个。',
-    '错因：近义/形近 '+st.near+'，记忆偏差 '+st.far+'，无选错记录 '+st.unknown+'。'
+    '当前每日计划：'+planBookLabel()+'，已学 '+studied+'/'+planIds().length+'，正确率 '+acc+'%，错题 '+st.list.length+' 个。'
   ];
-  const top = coachTopWrong(8);
-  if(top.length) lines.push('高危词：'+top.map(function(i){
-    const n = state.wrong[i].n||1;
-    const d = wrongDiagData(i, state.wrong[i] && state.wrong[i].pick);
-    let s = WORDS[i][0]+'（'+cnOf(i)+'，错 '+n+' 次';
-    if(d && d.pickWord) s += '，误选「'+d.pickWord+'」，'+(d.kind==='near'?'近义干扰':'记忆偏差')+'，相似度 '+Number(d.sim).toFixed(2);
-    return s+'）';
-  }).join('；'));
+  if(withWrong !== false){
+    lines.push('错因：近义/形近 '+st.near+'，记忆偏差 '+st.far+'，无选错记录 '+st.unknown+'。');
+    const top = coachTopWrong(8);
+    if(top.length) lines.push('高危词：'+top.map(function(i){
+      const n = state.wrong[i].n||1;
+      const d = wrongDiagData(i, state.wrong[i] && state.wrong[i].pick);
+      let s = WORDS[i][0]+'（'+cnOf(i)+'，错 '+n+' 次';
+      if(d && d.pickWord) s += '，误选「'+d.pickWord+'」，'+(d.kind==='near'?'近义干扰':'记忆偏差')+'，相似度 '+Number(d.sim).toFixed(2);
+      return s+'）';
+    }).join('；'));
+  }
   const hit = matchWordInQuery(q);
   if(hit>=0){
     const it = WORDS[hit];
@@ -22439,11 +22473,15 @@ async function deepseekCall(q, opts){
     .slice(-8)
     .map(function(m){ return { role:(m.r==='u'?'user':'assistant'), content:coachHistoryContent(m) }; });
   if(!history.length || history[history.length-1].role !== 'user') history.push({role:'user', content:q});
+  const ccfg = coachCfgGet();
+  const styleLine = {direct:'语气直接、具体，先给结论。',encourage:'语气鼓励、耐心，先肯定再指出问题。',strict:'语气严格、克制，直接指出问题和必须补的点。',teacher:'像老师讲课，先讲原理再给练法。'}[ccfg.style] || '';
+  const lengthLine = {short:'回答控制在 100 字以内，只给最关键的两三点。',normal:'回答控制在 260 字以内，分点但不要用 Markdown 标记。',long:'回答可以详细一些，控制在 500 字以内，分点说明理由和例子。'}[ccfg.length] || '回答控制在 260 字以内，分点但不要用 Markdown 标记。';
   const system = '你是一名英语学习教练，服务对象是准备大学英语四级、六级的中文学生。'
     + '只根据给出的学习数据回答，不要编造不存在的答题记录。'
     + '用户消息里可能包含“附件”文本：先把附件读明白再回答，不要编造附件里没有的内容；用户没提要求时，先概括附件并给下一步建议。'
-    + '回答控制在 260 字以内，分点但不要用 Markdown 标记，语气直接、具体、可执行。'
-    + '学习数据：\n'+deepseekContext(q);
+    + styleLine + lengthLine
+    + (ccfg.nextStep ? '每次回答最后给一个明确的下一步动作。' : '')
+    + (ccfg.autoData ? '学习数据：\n'+deepseekContext(q, ccfg.autoDiag) : '用户关闭了自动附带学习数据，只在用户主动提供数据时使用。');
   const ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
   const timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 30000) : null;
   try{
@@ -22878,11 +22916,13 @@ function coachFileReply(f){
       text:csv
     };
     const sample = paper.qs.slice(0,2).map(function(q){ return q.prompt; }).join(' / ');
+    const acts = [{act:'coachPlayPaper', label:'打开这套题（'+paper.qs.length+' 题）'}];
+    if(coachCfgGet().allowAutoAnswer) acts.push({act:'paperAuto', label:'帮我全答（'+paper.qs.length+' 题）'});
     return {
       t:'识别到 '+paper.qs.length+' 道题：'+(sample||'')+(paper.qs.length>2?' …':'')+'\n'
         + '已整理成可直接作答的练习。点「打开这套题」开始；也可以下载整理后的 CSV。',
       out:out,
-      a:[{act:'coachPlayPaper', label:'打开这套题（'+paper.qs.length+' 题）'},{act:'paperAuto', label:'帮我全答（'+paper.qs.length+' 题）'}]
+      a:acts
     };
   }
   const lines = text.split(/\n/).map(function(s){ return s.trim(); }).filter(Boolean);
@@ -23030,7 +23070,7 @@ function coachHtml(){
   return '<div class="coach">'
     + '<div class="coach-head"><div class="coach-avatar">AI</div>'
     +   '<div class="ct"><b>学习教练</b><span>'+(deepseekReady()?'DeepSeek 在线 · 对话 + 文件':'离线规则智能体 · 支持文本文件')+'</span></div>'
-    +   '<button class="coach-cfg" data-act="nav" data-v="#/settings">设置</button>'
+    +   '<button class="coach-cfg" data-act="nav" data-v="#/coachset">设置</button>'
     +   '<button class="coach-clear" data-act="coachClear">清空</button>'
     + '</div>'
     + '<div class="coach-log" id="coachlog">'+intro+log.map(function(m,idx){ return coachMsgHtml(m,idx); }).join('')+'</div>'
@@ -23040,7 +23080,7 @@ function coachHtml(){
     +   '<button data-act="coachQuick" data-q="我最薄弱的词">薄弱词</button>'
     +   '<button data-act="coachQuick" data-q="给我一组辨析练习">易混辨析</button>'
     +   '<button data-act="coachExport">导出报告</button>'
-    +   (state.coachPaper && state.coachPaper.qs && state.coachPaper.qs.length ? '<button data-act="paperAuto">帮我全答（'+state.coachPaper.qs.length+' 题）</button>' : '')
+    +   (state.coachPaper && state.coachPaper.qs && state.coachPaper.qs.length && coachCfgGet().allowAutoAnswer ? '<button data-act="paperAuto">帮我全答（'+state.coachPaper.qs.length+' 题）</button>' : '')
     + '</div>'
     + '<div class="coach-attachrow">'+pending+'</div>'
     + '<div class="coach-form">'
@@ -23076,13 +23116,15 @@ function coachAsk(raw, fileArg){
   state.coach.push({r:'u', t:q, f:file});
   coachPendingFile = null;
   if(!deepseekReady()){
-    state.coach.push(Object.assign({r:'a'}, file ? coachFileReply(file) : coachReply(q)));
+    const msg = Object.assign({r:'a'}, file ? coachFileReply(file) : coachReply(q));
+    state.coach.push(msg);
     if(state.coach.length > 30) state.coach = state.coach.slice(-30);
     save(); render(); coachScroll();
+    coachQuickSay(msg.t);
     return;
   }
   const local = file ? coachFileReply(file) : coachReply(q);
-  const paperAsk = !file && state.coachPaper && !/别|不要|不用/.test(q) && /(全答|全做|全部答|全部做|帮我答|代答|都答|答完|做完)/.test(q);
+  const paperAsk = !file && state.coachPaper && !/别|不要|不用/.test(q) && coachCfgGet().allowAutoAnswer && /(全答|全做|全部答|全部做|帮我答|代答|都答|答完|做完)/.test(q);
   if(paperAsk){
     const p = state.coachPaper;
     const qs = p && Array.isArray(p.qs) ? p.qs : [];
@@ -23125,6 +23167,7 @@ function coachAsk(raw, fileArg){
     });
     if(state.coach.length > 30) state.coach = state.coach.slice(-30);
     save(); render(); coachScroll();
+    coachQuickSay(txt);
   }).catch(function(err){
     if(seq !== coachReqSeq) return;
     coachBusy = false;
@@ -23135,6 +23178,7 @@ function coachAsk(raw, fileArg){
     state.coach.push(fallback);
     if(state.coach.length > 30) state.coach = state.coach.slice(-30);
     save(); render(); coachScroll();
+    coachQuickSay(fallback.t);
   });
 }
 
@@ -23705,6 +23749,8 @@ function viewSettings(){
   + '</div>'
   + '<div class="panel">'
   +   '<h3>数据</h3>'
+  +   '<div class="setrow"><div class="lab"><b>导出当前题目</b><span>把这轮正在答的题全部导出成 CSV，含答案和你的作答</span></div>'
+  +   '<button class="ghost" data-act="exportSession">导出</button></div>'
   +   '<div class="setrow"><div class="lab"><b>导出进度</b><span>保存成 JSON 文件，换设备可导回</span></div>'
   +   '<button class="ghost" data-act="export">导出</button></div>'
   +   '<div class="setrow"><div class="lab"><b>进度码</b><span>复制后发到手机或聊天，粘贴即可恢复；不含 API Key</span></div>'
@@ -23719,6 +23765,133 @@ function viewSettings(){
   + '</div>'
   + '<div class="note">四级 '+N+' 词 · 六级 '+CET6_IDS.length+' 词，去重后共 '+uniqueWordCount()+' 条；音标为英式（DJ）。数据只存在本机浏览器里，不上传。</div>'
   + voiceSheet;
+}
+
+/* ============================================================
+   学习教练专属设置
+   ============================================================ */
+function viewCoachSettings(){
+  const c = coachCfgGet();
+  const active = coachActiveQs();
+  const chip = function(k, v, label){
+    return '<button class="chip '+(String(c[k])===String(v)?'on':'')+'" data-act="coachSet" data-k="'+k+'" data-v="'+v+'">'+label+'</button>';
+  };
+  const sw = function(k, title, desc){
+    return '<div class="setrow"><div class="lab"><b>'+title+'</b><span>'+desc+'</span></div>'
+      + '<div class="switch '+(c[k]?'on':'')+'" data-act="coachToggle" data-k="'+k+'"><i></i></div></div>';
+  };
+  return ''
+    + '<div class="topbar">'
+    +   '<button class="iconbtn" data-act="nav" data-v="#/analysis" title="返回教练">'+ICON.back+'</button>'
+    +   '<div class="topmid"><div class="t">教练设置</div><div class="s">对话 · 文件 · 题目 · DeepSeek</div></div>'
+    + '</div>'
+    + '<div class="panel">'
+    +   '<h3>回复风格</h3>'
+    +   '<div class="setrow"><div class="lab"><b>语气</b><span>影响教练回答的口吻，不会改变内容</span></div>'
+    +     '<div class="seg">'+chip('style','direct','直接')+chip('style','encourage','鼓励')+chip('style','strict','严格')+chip('style','teacher','像老师')+'</div></div>'
+    +   '<div class="setrow"><div class="lab"><b>详细度</b><span>短：只给结论；详细：带理由和例子</span></div>'
+    +     '<div class="seg">'+chip('length','short','短')+chip('length','normal','标准')+chip('length','long','详细')+'</div></div>'
+    + '</div>'
+    + '<div class="panel">'
+    +   '<h3>功能开关</h3>'
+    +   sw('autoData', '自动附带学习数据', '提问时带上已学、正确率、错题和高危词')
+    +   sw('autoDiag', '自动诊断错题', '在附带数据里包含错因和高危词分析')
+    +   sw('allowAutoAnswer', '允许代答导入题目', '上传题目文件后，可点「帮我全答」直接看参考答案')
+    +   sw('speakReply', '朗读教练回复', '每次回答后自动用系统中文语音读一遍')
+    +   sw('nextStep', '末尾给下一步', '每次回答最后附一个明确的练习动作')
+    + '</div>'
+    + '<div class="panel">'
+    +   '<h3>当前题目</h3>'
+    +   '<div class="setrow"><div class="lab"><b>导出范围</b><span>全部：含未答；只错题：只导出答错的</span></div>'
+    +     '<div class="seg">'+chip('exportScope','all','全部')+chip('exportScope','answered','只已答')+chip('exportScope','wrong','只错题')+'</div></div>'
+    +   '<div class="setrow"><div class="lab"><b>导出全部题目</b><span>'+(active ? esc(active.label)+' · '+active.qs.length+' 题，含未答和已答' : '现在没有正在答的题目')+'</span></div>'
+    +     '<button class="ghost" data-act="exportSession"'+(active?'':' disabled')+'>导出 CSV</button></div>'
+    +   '<div class="note">导出会包含题干、选项、正确答案、你的作答和正确/错误状态，可直接用 Excel 打开。</div>'
+    + '</div>'
+    + '<div class="panel">'
+    +   '<h3>DeepSeek AI</h3>'
+    +   '<div class="note" style="margin-top:0">'+(deepseekReady()?'已接入 DeepSeek，学习教练会优先调用云模型；失败自动回退离线教练。':'未配置时使用离线教练。填写 DeepSeek API Key 后启用。')+'</div>'
+    +   '<div class="dbform">'
+    +     '<label>API Key</label>'
+    +     '<input id="dsKey" type="password" autocomplete="off" placeholder="'+(DEEPSEEK.key?'已内置默认 Key，留空不改':'粘贴 DeepSeek API Key（sk- 开头）')+'">'
+    +     '<label>模型</label>'
+    +     '<input id="dsModel" autocomplete="off" value="'+esc(DEEPSEEK.model)+'" placeholder="例如 deepseek-flash 或 deepseek-v4-pro">'
+    +     '<label>接口地址</label>'
+    +     '<input id="dsEndpoint" autocomplete="off" value="'+esc(DEEPSEEK.endpoint)+'" placeholder="https://...">'
+    +   '</div>'
+    +   '<div class="seg" style="margin-top:10px">'
+    +     '<button class="ghost" data-act="saveDeepSeek">保存并启用</button>'
+    +     '<button class="ghost" data-act="testDeepSeek">测试连接</button>'
+    +     '<button class="ghost danger" data-act="clearDeepSeek">恢复默认</button>'
+    +   '</div>'
+    +   '<div class="note"><a class="minilink" href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">去 DeepSeek 获取 Key</a> <a class="minilink" href="https://api-docs.deepseek.com/zh-cn/" target="_blank" rel="noopener">API 文档</a></div>'
+    + '</div>'
+    + '<div class="note">设置只保存在本机；API Key 不会写进进度码或导出文件。</div>';
+}
+function coachActiveQs(){
+  const s = (S && S.qs && S.qs.length) ? S : ((state.session && state.session.qs && state.session.qs.length) ? state.session : null);
+  if(s) return { qs:s.qs, label:s.label || '当前练习' };
+  if(state.coachPaper && state.coachPaper.qs && state.coachPaper.qs.length) return { qs:state.coachPaper.qs, label:state.coachPaper.label || '导入题目' };
+  return null;
+}
+function sessionPrompt(q){
+  if(q && q.prompt) return String(q.prompt);
+  const i = q && typeof q.i==='number' ? q.i : -1;
+  const it = (i>=0 && WORDS[i]) ? WORDS[i] : null;
+  if(!it) return '';
+  const cn = cleanDef(it[3], it[0]);
+  if(q.t==='cn2en') return cn;
+  if(q.t==='fill') return (q.mask || '') + (cn ? '（'+cn+'）' : '');
+  return it[0];
+}
+function sessionOptionText(q, o){
+  if(!o) return '';
+  if(o.text!=null) return String(o.text);
+  if(typeof o.i==='number' && WORDS[o.i]) return (q && q.t==='cn2en') ? WORDS[o.i][0] : cleanDef(WORDS[o.i][3], WORDS[o.i][0]);
+  return '';
+}
+function sessionCorrectText(q){
+  if(!q) return '';
+  if(q.t==='fill'){
+    if(q.opts && q.opts[0] && q.opts[0].text) return String(q.opts[0].text);
+    return String(q.answer || q.correct || '');
+  }
+  const idx = (q.opts || []).findIndex(function(o){ return o.ok; });
+  if(idx>=0) return String.fromCharCode(65+idx)+'. '+sessionOptionText(q, q.opts[idx]);
+  return String(q.answer || q.correct || '');
+}
+function sessionPickText(q){
+  if(!q || q.chosen==null || q.chosen<0) return '未答';
+  if(q.t==='fill') return q.answerText || '（空）';
+  return sessionOptionText(q, q.opts[q.chosen]);
+}
+function sessionStatus(q){
+  if(!q || q.chosen==null || q.chosen<0) return '未答';
+  return (q.t==='fill' ? q.chosen===0 : !!(q.opts && q.opts[q.chosen] && q.opts[q.chosen].ok)) ? '正确' : '错误';
+}
+function exportCurrentSession(){
+  const active = coachActiveQs();
+  if(!active){ toast('当前没有正在答的题目'); return; }
+  const scope = coachCfgGet().exportScope || 'all';
+  const list = active.qs.filter(function(q){
+    if(scope==='answered') return q.chosen!=null && q.chosen>=0;
+    if(scope==='wrong') return sessionStatus(q)==='错误';
+    return true;
+  });
+  if(!list.length){ toast(scope==='wrong'?'没有错题可导出':'还没有已答的题'); return; }
+  const rows = [['序号','题型','题干','选项A','选项B','选项C','选项D','正确答案','我的作答','状态'].map(coachCsvCell).join(',')];
+  list.forEach(function(q, k){
+    const opts = (q.opts || []).map(function(o){ return sessionOptionText(q, o); });
+    let type = '选择题';
+    if(q.t==='fill') type = '填空';
+    else if(q.custom) type = '导入选择题';
+    else if(q.t==='cn2en') type = '汉语选单词';
+    else if(q.t==='en2cn') type = '单词选汉语';
+    rows.push([k+1, type, sessionPrompt(q), opts[0]||'', opts[1]||'', opts[2]||'', opts[3]||'', sessionCorrectText(q), sessionPickText(q), sessionStatus(q)].map(coachCsvCell).join(','));
+  });
+  const csv = '\ufeff'+rows.join('\n');
+  coachSaveBlob('当前题目-'+coachStamp()+'.csv', csv, 'text/csv');
+  toast('已导出 '+list.length+' 道题');
 }
 
 /* ============================================================
@@ -23944,6 +24117,9 @@ document.addEventListener('click', function(e){
     return;
   }
   if(act==='coachExport'){ coachExportReport(); return; }
+  if(act==='coachSet'){ coachCfgSet(el.getAttribute('data-k'), el.getAttribute('data-v')); return; }
+  if(act==='coachToggle'){ coachCfgToggle(el.getAttribute('data-k')); return; }
+  if(act==='exportSession'){ exportCurrentSession(); return; }
   if(act==='coachPlayPaper'){
     const p = state.coachPaper;
     if(!p || !p.qs || !p.qs.length){ toast('先发一个题目文件'); return; }
