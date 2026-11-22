@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>单词大师 · 四级 / 六级</title>
 <meta name="application-name" content="单词大师">
-<meta name="app-version" content="2026.11.22.6">
+<meta name="app-version" content="2026.11.22.7">
 <meta name="app-build-date" content="2026-11-22">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23007AFF'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='19' font-weight='600' fill='%23FFFFFF' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
 <style>
@@ -18935,7 +18935,7 @@ const EXAMPLES = {"abandon":[["v.",[["He claimed that his parents had abandoned 
    ============================================================ */
 const N = WORDS.length;
 const LS_KEY = 'cet4vocab_20d_v1';
-const APP_VERSION = '2026.11.22.6';
+const APP_VERSION = '2026.11.22.7';
 const APP_VERSION_DATE = '2026-11-22';
 const UPDATE_DEFAULT_SRC = 'https://zhaowenhan371-blip.github.io/word-master/update.json';
 let updateFound = null;
@@ -20935,10 +20935,8 @@ function bookRowHtml(b){
     + '<div class="bk-ic">'+ICON.book+'</div>'
     + '<div class="bk-info"><div class="bk-name">'+esc(b.name)+' <span class="chip '+tagCls+' bktag">'+esc(tag)+'</span></div>'
     +   '<div class="bk-meta">'+meta+'</div></div>'
-    + '<div class="bookbtns">'
-    +   '<button class="minilink" data-act="customPractice" data-b="'+esc(b.id)+'"'+(n?'':' disabled')+'>'+(n?'练习':'待导入')+'</button>'
-    +   (b.builtin?'':'<button class="iconbtn plain" style="width:26px;height:26px;flex:0 0 26px" data-act="customDelete" data-b="'+esc(b.id)+'" title="删除单词本">'+ICON.trash+'</button>')
-    + '</div></div>';
+    + (b.builtin?'':'<div class="bookbtns"><button class="iconbtn plain" style="width:26px;height:26px;flex:0 0 26px" data-act="customDelete" data-b="'+esc(b.id)+'" title="删除单词本">'+ICON.trash+'</button></div>')
+    + '</div>';
 }
 function customBookRowHtml(b){ return bookRowHtml(b); }
 
