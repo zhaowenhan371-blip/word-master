@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>单词大师 · 四级 / 六级</title>
 <meta name="application-name" content="单词大师">
-<meta name="app-version" content="2026.11.22.15">
+<meta name="app-version" content="2026.11.22.16">
 <meta name="app-build-date" content="2026-11-22">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23007AFF'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='19' font-weight='600' fill='%23FFFFFF' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
 <style>
@@ -19146,7 +19146,7 @@ const EXAMPLES = {"abandon":[["v.",[["He claimed that his parents had abandoned 
    ============================================================ */
 const N = WORDS.length;
 const LS_KEY = 'cet4vocab_20d_v1';
-const APP_VERSION = '2026.11.22.15';
+const APP_VERSION = '2026.11.22.16';
 const APP_VERSION_DATE = '2026-11-22';
 const UPDATE_DEFAULT_SRC = 'https://zhaowenhan371-blip.github.io/word-master/update.json';
 let updateFound = null;
@@ -21369,7 +21369,7 @@ function viewPaperQuiz(){
     +   '<button class="primary" data-act="next" '+(answered?'':'disabled')+'>'+nextLabel+'</button>'
     + '</div>'
     + '<div class="qcard">'
-    +   '<div class="qmeta"><span class="tag">'+(q.t==='fill'?'填空':'选择题')+'</span><span class="hint">导入题目 · 按原题作答</span></div>'
+    +   '<div class="qmeta"><span class="tag">'+(q.t==='fill'?'填空':'选择题')+'</span><span class="hint">'+(S.label==='教练出题'?'AI 出题':'导入题目')+' · 按原题作答</span></div>'
     +   '<div class="prompt"><div class="paper-prompt'+(String(q.prompt||'').length>60?' long':'')+'">'+esc(q.prompt)+'</div></div>'
     +   (q.t==='fill' ? fillPanel : '<div class="opts">'+opts+'</div>')
     + '</div>'
@@ -22483,6 +22483,9 @@ async function deepseekCall(q, opts){
   const system = '你是一名英语学习教练，服务对象是准备大学英语四级、六级的中文学生。'
     + '只根据给出的学习数据回答，不要编造不存在的答题记录。'
     + '用户消息里可能包含“附件”文本：先把附件读明白再回答，不要编造附件里没有的内容；用户没提要求时，先概括附件并给下一步建议。'
+    + '当用户要求出题、来几道题或做练习时，不受字数限制，先给一句说明，然后严格按下面格式输出：\n'
+    + '1. 题干\nA. 选项\nB. 选项\nC. 选项\nD. 选项\n答案：A\n'
+    + '每题之间空一行；答案只写字母；题干和选项不要用 Markdown 粗体、表格或代码块；除答案外不要写解析。'
     + styleLine + lengthLine
     + (ccfg.nextStep ? '每次回答最后给一个明确的下一步动作。' : '')
     + (ccfg.autoData ? '学习数据：\n'+deepseekContext(q, ccfg.autoDiag) : '用户关闭了自动附带学习数据，只在用户主动提供数据时使用。');
@@ -22785,9 +22788,13 @@ function coachPaperQ(prompt, options, answer){
       const n = parseInt(key,10);
       idx = (n > 0 && n <= opts.length) ? n-1 : n;
     } else {
-      const nk = coachNormText(key);
-      idx = opts.findIndex(function(o){ return coachNormText(o) === nk; });
-      if(idx < 0 && nk) idx = opts.findIndex(function(o){ return coachNormText(o).indexOf(nk) >= 0; });
+      const lm = key.match(/^([A-Za-z])\s*[\.、)．:：]\s*/);
+      if(lm) idx = lm[1].toUpperCase().charCodeAt(0)-65;
+      if(idx < 0 || idx >= opts.length){
+        const nk = coachNormText(key);
+        idx = opts.findIndex(function(o){ return coachNormText(o) === nk; });
+        if(idx < 0 && nk) idx = opts.findIndex(function(o){ return coachNormText(o).indexOf(nk) >= 0; });
+      }
     }
     if(idx < 0 || idx >= opts.length) return null;
     return {
@@ -22852,13 +22859,20 @@ function coachParseQuestionCsv(f){
   return { label:String(f.name||'导入题目').replace(/\.(txt|md|csv|json|docx)$/i,''), qs:qs };
 }
 function coachParseQuestionTxt(f){
+  const clean = function(s){
+    return String(s==null?'':s)
+      .replace(/^\s*[-*•]\s*/,'')
+      .replace(/\*\*/g,'')
+      .replace(/`/g,'')
+      .trim();
+  };
   const text = String(f.text||'').replace(/\r\n/g,'\n');
-  const lines = text.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  const lines = text.split('\n').map(clean).filter(Boolean);
   if(lines.length < 2) return null;
   const blocks = [];
   let cur = [];
   lines.forEach(function(line){
-    if(/^(?:\d+[\.、)]|第\s*\d+\s*题|【\s*\d+\s*】)/.test(line) && cur.length){
+    if(/^(?:\d+[\.、)．]|第\s*\d+\s*题|【\s*\d+\s*】)/.test(line) && cur.length){
       blocks.push(cur); cur = [];
     }
     cur.push(line);
@@ -22868,19 +22882,19 @@ function coachParseQuestionTxt(f){
   blocks.forEach(function(block){
     const flat = [];
     block.forEach(function(line){
-      line.replace(/\s+([A-Da-d])[\.、)]\s*/g, '\n$1. ').split('\n').forEach(function(x){
+      line.replace(/\s+([A-Da-d])[\.、)．]\s*/g, '\n$1. ').split('\n').forEach(function(x){
         if(String(x).trim()) flat.push(String(x).trim());
       });
     });
     let prompt = '', answer = '';
     const options = [];
     flat.forEach(function(line, k){
-      const om = line.match(/^([A-Da-d])[\.、)]\s*(.+)$/);
-      if(om){ options[om[1].toUpperCase().charCodeAt(0)-65] = om[2].trim(); return; }
+      const om = line.match(/^([A-Da-d])[\.、)．]\s*(.+)$/);
+      if(om){ options[om[1].toUpperCase().charCodeAt(0)-65] = clean(om[2]); return; }
       const am = line.match(/^(?:答案|正确答案|answer|correct)\s*[：:]\s*(.+)$/i);
-      if(am){ answer = am[1].trim(); return; }
+      if(am){ answer = clean(am[1]); return; }
       if(!prompt && !/^(?:答案|正确答案)\s*[：:]/.test(line)){
-        prompt = line.replace(/^(?:\d+[\.、)]|第\s*\d+\s*题|【\s*\d+\s*】)\s*/,'').trim();
+        prompt = clean(line.replace(/^(?:\d+[\.、)．]|第\s*\d+\s*题|【\s*\d+\s*】)\s*/,''));
       }
     });
     if(prompt && answer && options.filter(Boolean).length >= 2){
@@ -22897,6 +22911,15 @@ function coachParsePaper(f){
   if(ext === 'json') return coachParseQuestionJson(f);
   if(ext === 'csv') return coachParseQuestionCsv(f) || coachParseQuestionJson(f);
   return coachParseQuestionTxt(f);
+}
+function coachWantsQuiz(q){
+  return !/别|不要|不用/.test(q) && /(出题|出几道|来几道|给我.*题|做.*题|练.*题|测一测|考我|小测|练习)/.test(q);
+}
+function coachGeneratedPaper(txt, force){
+  const paper = coachParseQuestionTxt({ text:txt, name:'教练出题' });
+  if(!paper || !paper.qs || !paper.qs.length) return null;
+  if(!force && paper.qs.length < 2) return null;
+  return { label:'教练出题', qs:paper.qs, createdAt:Date.now() };
 }
 function coachPaperCsv(qs){
   const rows = [['题目','选项A','选项B','选项C','选项D','答案'].map(coachCsvCell).join(',')];
@@ -23083,6 +23106,7 @@ function coachHtml(){
     +   '<button data-act="coachQuick" data-q="诊断我的错题">诊断错题</button>'
     +   '<button data-act="coachQuick" data-q="我最薄弱的词">薄弱词</button>'
     +   '<button data-act="coachQuick" data-q="给我一组辨析练习">易混辨析</button>'
+    +   (deepseekReady() ? '<button data-act="coachQuick" data-q="给我出5道四级词汇选择题，每题四个选项，附答案">出 5 道题</button>' : '')
     +   '<button data-act="coachExport">导出报告</button>'
     +   (state.coachPaper && state.coachPaper.qs && state.coachPaper.qs.length && coachCfgGet().allowAutoAnswer ? '<button data-act="paperAuto">帮我全答（'+state.coachPaper.qs.length+' 题）</button>' : '')
     + '</div>'
@@ -23164,14 +23188,24 @@ function coachAsk(raw, fileArg){
     if(seq !== coachReqSeq) return;
     coachBusy = false;
     state.coach = state.coach.filter(function(m){ return !m.tmp; });
-    state.coach.push({
-      r:'a', t:txt,
-      a:(file && local && local.a) ? local.a : [],
-      out:file ? (local.out || coachFileOut(txt, '文件回复')) : null
-    });
+    const gen = (!file && !paperAsk) ? coachGeneratedPaper(txt, coachWantsQuiz(q)) : null;
+    let say = txt;
+    if(gen){
+      state.coachPaper = gen;
+      const acts = [{act:'coachPlayPaper', label:'开始答题（'+gen.qs.length+' 题）'}];
+      if(coachCfgGet().allowAutoAnswer) acts.push({act:'paperAuto', label:'帮我全答（'+gen.qs.length+' 题）'});
+      say = '已生成 '+gen.qs.length+' 道题，并转成可以直接作答的答题页。点「开始答题」进入，和平时做题一样选选项、看结果。';
+      state.coach.push({ r:'a', t:say, a:acts, paper:true });
+    } else {
+      state.coach.push({
+        r:'a', t:txt,
+        a:(file && local && local.a) ? local.a : [],
+        out:file ? (local.out || coachFileOut(txt, '文件回复')) : null
+      });
+    }
     if(state.coach.length > 30) state.coach = state.coach.slice(-30);
     save(); render(); coachScroll();
-    coachQuickSay(txt);
+    coachQuickSay(say);
   }).catch(function(err){
     if(seq !== coachReqSeq) return;
     coachBusy = false;
@@ -24130,7 +24164,7 @@ document.addEventListener('click', function(e){
     const begin = function(){ startPaper(p.qs, p.label); };
     if(state.session && state.session.qs && state.session.qs.some(function(q){ return q.chosen<0; })){
       const left = state.session.qs.filter(function(q){ return q.chosen<0; }).length;
-      showDialog('当前还有未完成的练习', '打开导入的这套题会替换掉当前进度；已学词、错题本不受影响。', '打开这套题', '先不打开', function(ok){ if(ok) begin(); });
+      showDialog('当前还有未完成的练习', '打开这套题会替换掉当前进度；已学词、错题本不受影响。', '打开这套题', '先不打开', function(ok){ if(ok) begin(); });
       return;
     }
     begin();
