@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>单词大师 · 四级 / 六级</title>
 <meta name="application-name" content="单词大师">
-<meta name="app-version" content="2026.11.22.3">
+<meta name="app-version" content="2026.11.22.4">
 <meta name="app-build-date" content="2026-11-22">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23007AFF'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='19' font-weight='600' fill='%23FFFFFF' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
 <style>
@@ -2042,6 +2042,19 @@ body.dark .ai-sheet-metrics>div{background:rgba(255,255,255,.04);border-color:rg
 .ai-sheet-metrics b{display:block;font-size:18px;line-height:1.2;font-weight:680;margin-top:2px;font-variant-numeric:tabular-nums}
 .ai-sheet-metrics small{font-size:10px;font-weight:400;color:var(--muted);margin-left:1px}
 .home-sheet-actions{display:grid;grid-template-columns:1.2fr 1fr;gap:8px}
+.planbook-sub{font-size:11.5px;line-height:1.55;color:var(--muted);margin:0 0 10px}
+.planbook-list{display:grid;gap:8px}
+.bookpick{display:flex;align-items:center;gap:10px;width:100%;padding:12px;border-radius:16px;border:1px solid var(--lq-rim);background:var(--lq-clear);text-align:left;color:var(--ink);-webkit-backdrop-filter:var(--lq-blur);backdrop-filter:var(--lq-blur)}
+.bookpick.on{background:rgba(10,132,255,.11);border-color:rgba(10,132,255,.34);box-shadow:0 8px 20px rgba(10,132,255,.10)}
+body.dark .bookpick.on{background:rgba(10,132,255,.20);border-color:rgba(100,181,255,.38)}
+.bookpick .bk-ic{flex:0 0 33px;width:33px;height:33px}
+.bookpick .bk-name{font-size:14px}
+.bookpick .bk-meta{font-size:11px;margin-top:3px}
+.plancheck{flex:0 0 23px;height:23px;border-radius:50%;display:grid;place-items:center;color:var(--accent);font-size:13px;font-weight:700;border:1px solid var(--line);background:rgba(255,255,255,.10)}
+.bookpick.on .plancheck{color:#fff;border-color:transparent;background:var(--accent)}
+.planbook-switch{display:flex;gap:7px;margin:0 0 12px}
+.planbook-switch .pb{flex:1;padding:10px 8px;border-radius:12px;border:1px solid var(--lq-rim);background:var(--lq-clear);font-size:12px;font-weight:600;color:var(--ink-2);-webkit-backdrop-filter:var(--lq-blur);backdrop-filter:var(--lq-blur)}
+.planbook-switch .pb.on{color:#fff;border-color:transparent;background:var(--accent);box-shadow:0 8px 20px rgba(10,132,255,.20)}
 .hs-action{
   padding:11px 10px;border-radius:13px;border:1px solid var(--lq-rim);background:var(--lq-clear);
   -webkit-backdrop-filter:var(--lq-blur);backdrop-filter:var(--lq-blur);
@@ -18919,7 +18932,7 @@ const EXAMPLES = {"abandon":[["v.",[["He claimed that his parents had abandoned 
    ============================================================ */
 const N = WORDS.length;
 const LS_KEY = 'cet4vocab_20d_v1';
-const APP_VERSION = '2026.11.22.3';
+const APP_VERSION = '2026.11.22.4';
 const APP_VERSION_DATE = '2026-11-22';
 const UPDATE_DEFAULT_SRC = 'https://zhaowenhan371-blip.github.io/word-master/update.json';
 let updateFound = null;
@@ -19090,7 +19103,7 @@ LETTERS.sort();
 function blankState(){
   return {
     settings:{ days:20, sound:0, theme:'light', voice:'', audio:'online', accent:'us', wallpaper:'', wallTone:'', updateUrl:'' },
-    words:{}, wrong:{}, fav:{}, days:{}, dates:{}, trophies:{}, session:null, coach:[],
+    words:{}, wrong:{}, fav:{}, days:{}, dates:{}, trophies:{}, session:null, coach:[], planBook:'cet4',
     customBooks:[], customSeq:100000
   };
 }
@@ -19159,6 +19172,42 @@ function bookIds(b){
   if(b.id==='cet6') return CET6_IDS.slice();
   return (b.words||[]).map(function(w){ return w.uid; }).filter(function(i){ return WORDS[i]; });
 }
+function planBookId(){ return state.planBook==='cet6' ? 'cet6' : 'cet4'; }
+function planBookLabelFor(bookId){ return bookId==='cet6' ? '六级' : '四级'; }
+function planBookNameFor(bookId){ return bookId==='cet6' ? '六级高频词' : '四级高频词'; }
+function planBookLabel(){ return planBookLabelFor(planBookId()); }
+function planIdsFor(bookId){ return bookId==='cet6' ? CET6_IDS.slice() : cet4Ids(); }
+function planIds(){ return planIdsFor(planBookId()); }
+function planBookName(){ return planBookNameFor(planBookId()); }
+function planBookPerDay(bookId){
+  const n = planIdsFor(bookId).length;
+  const D = state.settings.days || 20;
+  return Math.round(n/D);
+}
+function applyPlanBookSelection(bookId){
+  if(bookId===planBookId()){ closeHomeSheet(); return; }
+  const cur = state.session;
+  const pendingDay = cur && cur.mode==='day' && (cur.book || 'cet4')!==bookId
+    && cur.qs && cur.qs.some(function(q){ return q.chosen<0; });
+  const commit = function(){
+    state.planBook = bookId;
+    save();
+    closeHomeSheet();
+    render();
+    toast('每日计划已切换为'+planBookLabelFor(bookId));
+  };
+  if(pendingDay){
+    const left = cur.qs.filter(function(q){ return q.chosen<0; }).length;
+    closeHomeSheet();
+    showDialog('切换每日计划？', '当前还有'+planBookLabelFor(cur.book||'cet4')+' Day '+(cur.day+1)+' 的 '+left+' 题没答完。\n切换会放弃这轮临时进度，已答过的单词记录和错题本都会保留。', '切换', '取消', function(ok){
+      if(!ok) return;
+      state.session = null; S = null;
+      commit();
+    });
+    return;
+  }
+  commit();
+}
 function allBooks(){
   const customs=(state.customBooks||[]).filter(function(b){ return b && !b.builtin && Array.isArray(b.words) && b.words.length; });
   return builtinBooks().concat(customs);
@@ -19192,6 +19241,7 @@ function load(){
     if(!Array.isArray(state.coach)) state.coach=[];
     if(!Array.isArray(state.customBooks)) state.customBooks=[];
     if(typeof state.customSeq!=='number' || state.customSeq<CUSTOM_BASE) state.customSeq=CUSTOM_BASE;
+    state.planBook = state.planBook==='cet6' ? 'cet6' : 'cet4';
     if(state.coach.some(function(m){ return m && m.tmp; })) state.coach = state.coach.filter(function(m){ return !(m && m.tmp); });
     // 旧版题面用的是随机干扰项，临时进度作废（单词记录、错题本不受影响）
     if(state.session && state.session.ver!=='v4') state.session = null;
@@ -19231,6 +19281,7 @@ seedCet6();
 
 let S = (state.session && state.session.qs && state.session.qs.length) ? state.session : null;
 let wordBack = '#/home';
+if(S && S.mode==='day' && !S.book){ S.book='cet4'; save(); }
 // 旧版本遗留的混合题型会话直接作废，词记录与错题本保留
 if(S && S.qs.some(function(q){ return q.t!=='en2cn'; })){ S=null; state.session=null; save(); }
 if(S && (S.mode==='custom' || S.mode==='book') && S.qs.some(function(q){ return !WORDS[q.i]; })){ S=null; state.session=null; save(); }
@@ -19251,16 +19302,27 @@ let lastResult = null;
 /* ============================================================
    天计划（A–Z 均匀切分，互不重复，全覆盖）
    ============================================================ */
-const DAY_CACHE = {D:0, map:null};
-function dayMap(D){
-  if(DAY_CACHE.D===D && DAY_CACHE.map) return DAY_CACHE.map;
+let DAY_CACHE = {};
+function dayMapFor(D, bookId){
+  bookId = bookId==='cet6' ? 'cet6' : 'cet4';
+  const ck = bookId+'|'+D;
+  if(DAY_CACHE[ck]) return DAY_CACHE[ck];
+  const ids = planIdsFor(bookId);
+  const groups = {};
+  const letters = [];
+  ids.forEach(function(i){
+    const k = letterOf(i);
+    if(!groups[k]){ groups[k]=[]; letters.push(k); }
+    groups[k].push(i);
+  });
+  letters.sort();
   const map=[];
   for(let d=0; d<D; d++) map.push([]);
   const counts = new Array(D);
   for(let d=0; d<D; d++) counts[d]=0;
   // 逐字母轮转填充空位最少的一天：每天词量均衡，且每天都覆盖 A–Z 大部分字母
-  LETTERS.forEach(function(k, kk){
-    const arr = LETTER_GROUPS[k];
+  letters.forEach(function(k, kk){
+    const arr = groups[k];
     for(let j=0; j<arr.length; j++){
       let best=-1, bestC=1e9;
       for(let t=0; t<D; t++){
@@ -19272,10 +19334,12 @@ function dayMap(D){
     }
   });
   for(let d=0; d<D; d++) map[d].sort(function(a,b){ return a-b; });
-  DAY_CACHE.D=D; DAY_CACHE.map=map;
+  DAY_CACHE[ck] = map;
   return map;
 }
-function dayList(d){ return dayMap(state.settings.days)[d] || []; }
+function dayMap(D){ return dayMapFor(D, planBookId()); }
+function dayListFor(bookId, d){ return dayMapFor(state.settings.days, bookId)[d] || []; }
+function dayList(d){ return dayListFor(planBookId(), d); }
 
 function studiedCount(){
   let n=0;
@@ -19285,6 +19349,16 @@ function studiedCount(){
 function masteredCount(){
   let n=0;
   for(const k in state.words){ const r=state.words[k]; if(r && r.l===1) n++; }
+  return n;
+}
+function masteredInBook(bookId){
+  let n=0;
+  planIdsFor(bookId).forEach(function(i){ const r=state.words[i]; if(r && r.l===1) n++; });
+  return n;
+}
+function studiedInBook(bookId){
+  let n=0;
+  planIdsFor(bookId).forEach(function(i){ const r=state.words[i]; if(r && (r.r||r.w)) n++; });
   return n;
 }
 function accuracyAll(){
@@ -19304,8 +19378,8 @@ function calcStreak(){
   while(set[dayStrOf(d)]){ n++; d.setDate(d.getDate()-1); }
   return n;
 }
-function dayProgress(d){
-  const list = dayList(d);
+function dayProgress(d, bookId){
+  const list = dayListFor(bookId || planBookId(), d);
   let studied=0, right=0;
   for(let i=0;i<list.length;i++){
     const rec = state.words[list[i]];
@@ -19313,14 +19387,15 @@ function dayProgress(d){
   }
   return {total:list.length, studied:studied, right:right, done: list.length>0 && studied>=list.length};
 }
-function nextDay(){
+function nextDay(bookId){
   const D = state.settings.days;
-  for(let d=0; d<D; d++){ if(!dayProgress(d).done) return d; }
+  const b = bookId || planBookId();
+  for(let d=0; d<D; d++){ if(!dayProgress(d,b).done) return d; }
   return 0;
 }
 /* 奖杯：一个 Day 的所有单词都达到 l===1（完全掌握）才算完成 */
-function dayMastered(d){
-  const list = dayList(d);
+function dayMastered(d, bookId){
+  const list = dayListFor(bookId || planBookId(), d);
   if(!list.length) return false;
   for(let i=0;i<list.length;i++){
     const rec = state.words[list[i]];
@@ -19328,11 +19403,18 @@ function dayMastered(d){
   }
   return true;
 }
-function trophyCount(){
+function trophyKey(bookId, d){ return bookId==='cet6' ? ('cet6:'+d) : String(d); }
+function hasTrophy(bookId, d){ return !!(state.trophies && state.trophies[trophyKey(bookId,d)]); }
+function trophyCount(bookId){
   let n=0;
+  const b = bookId || planBookId();
+  const D = state.settings.days;
   for(const k in (state.trophies||{})){
-    const d = Number(k);
-    if(d>=0 && d<state.settings.days) n++;
+    if(b==='cet6'){
+      if(k.indexOf('cet6:')===0){ const d=Number(k.slice(6)); if(d>=0 && d<D) n++; }
+    }else{
+      if(k.indexOf('cet6:')!==0){ const d=Number(k); if(d>=0 && d<D) n++; }
+    }
   }
   return n;
 }
@@ -19341,21 +19423,32 @@ function seedTrophies(){
   if(!state.trophies || typeof state.trophies!=='object') state.trophies={};
   let changed=false;
   const D=state.settings.days;
+  ['cet4','cet6'].forEach(function(bookId){
+    for(let d=0; d<D; d++){
+      if(!hasTrophy(bookId,d) && dayMastered(d,bookId)){ state.trophies[trophyKey(bookId,d)]=1; changed=true; }
+    }
+  });
   for(const k in state.trophies){
-    const d=Number(k);
+    let bookId, d;
+    if(k.indexOf('cet6:')===0){ bookId='cet6'; d=Number(k.slice(6)); }
+    else { bookId='cet4'; d=Number(k); }
     if(!(d>=0 && d<D)){ delete state.trophies[k]; changed=true; }
-  }
-  for(let d=0; d<D; d++){
-    if(!state.trophies[d] && dayMastered(d)){ state.trophies[d]=1; changed=true; }
   }
   if(changed) save();
 }
 seedTrophies();
+function planDoneDays(bookId){
+  const D=state.settings.days;
+  let n=0;
+  for(let d=0; d<D; d++){ if(dayProgress(d,bookId).done) n++; }
+  return n;
+}
 function trophyShelfHtml(){
   const D=state.settings.days;
+  const b=planBookId();
   let slots='';
   for(let d=0; d<D; d++){
-    const got=!!state.trophies[d];
+    const got=hasTrophy(b,d);
     slots += '<div class="trophy-slot'+(got?' got':'')+'" title="Day '+(d+1)+(got?' · 已获得':' · 未获得')+'">'
       + ICON.trophy + '<span class="ts-day">'+(d+1)+'</span></div>';
   }
@@ -19364,10 +19457,10 @@ function trophyShelfHtml(){
 function trophyCabinetHtml(){
   const D=state.settings.days, n=trophyCount();
   return '<div class="trophy-card">'
-    + '<div class="trophy-head"><div><div class="tc-k">TROPHY CASE</div><div class="tc-title">奖杯收藏</div></div>'
+    + '<div class="trophy-head"><div><div class="tc-k">TROPHY CASE</div><div class="tc-title">'+planBookLabel()+'奖杯收藏</div></div>'
     +   '<div class="tc-count"><b>'+n+'</b><span>/ '+D+'</span></div></div>'
     + trophyShelfHtml()
-    + '<div class="tc-hint">'+(n>=D ? '全部 Day 的奖杯都拿到了，整套词库已经通关。' : '每个 Day 的单词全部完全掌握，答完题即可解锁 1 座奖杯。')+'</div>'
+    + '<div class="tc-hint">'+(n>=D ? '全部 Day 的奖杯都拿到了，这套词库已经通关。' : '每个 Day 的单词全部完全掌握，答完题即可解锁 1 座奖杯。')+'</div>'
     + '</div>';
 }
 function homeSheetHead(kicker, title, extra){
@@ -19375,21 +19468,49 @@ function homeSheetHead(kicker, title, extra){
     + '<div class="home-sheet-title">'+title+(extra||'')+'</div></div>'
     + '<button class="sheet-x" data-act="closeHomeSheet" aria-label="关闭">×</button></div>';
 }
+function planBookOptionHtml(bookId){
+  const on = planBookId()===bookId;
+  const n = planIdsFor(bookId).length;
+  const per = planBookPerDay(bookId);
+  const D = state.settings.days;
+  const done = planDoneDays(bookId);
+  const tagCls = bookId==='cet6' ? 'lv6' : 'lv4';
+  return '<button class="bookpick'+(on?' on':'')+'" data-act="setPlanBook" data-b="'+bookId+'">'
+    + '<div class="bk-ic">'+ICON.book+'</div>'
+    + '<div class="bk-info"><div class="bk-name">'+planBookNameFor(bookId)+' <span class="chip '+tagCls+' bktag">'+planBookLabelFor(bookId)+'</span></div>'
+    +   '<div class="bk-meta">'+n+' 词 · 每天约 '+per+' 词 · 已完成 '+done+'/'+D+' 天</div></div>'
+    + '<span class="plancheck">'+(on?'✓':'')+'</span>'
+    + '</button>';
+}
 function homeSheetHtml(kind){
   const D=state.settings.days;
+  if(kind==='planbook'){
+    return '<div class="home-sheet" id="homeSheet" role="dialog" aria-modal="true" aria-label="选择单词本">'
+      + '<button class="home-sheet-backdrop" data-act="closeHomeSheet" aria-label="关闭选择单词本"></button>'
+      + '<div class="home-sheet-card">'
+      + homeSheetHead('DAILY PLAN','选择单词本')
+      + '<div class="planbook-sub">选中的单词本会同时用于首页 Day 计划和按天出题，进度分别保存。</div>'
+      + '<div class="planbook-list">'+planBookOptionHtml('cet4')+planBookOptionHtml('cet6')+'</div>'
+      + '<div class="home-sheet-actions">'
+      +   '<button class="hs-action primary" data-act="planBookView">查看 '+D+' 天计划</button>'
+      +   '<button class="hs-action" data-act="closeHomeSheet">取消</button>'
+      + '</div>'
+      + '</div></div>';
+  }
   if(kind==='trophy'){
     const n=trophyCount();
     return '<div class="home-sheet" id="homeSheet" role="dialog" aria-modal="true" aria-label="奖杯收藏">'
       + '<button class="home-sheet-backdrop" data-act="closeHomeSheet" aria-label="关闭奖杯收藏"></button>'
       + '<div class="home-sheet-card">'
-      + homeSheetHead('TROPHY CASE','奖杯收藏','<span class="hs-count">'+n+' / '+D+'</span>')
+      + homeSheetHead('TROPHY CASE',planBookLabel()+'奖杯收藏','<span class="hs-count">'+n+' / '+D+'</span>')
       + trophyShelfHtml()
       + '<div class="tc-hint">'+(n>=D ? '全部 Day 的奖杯都拿到了，整套词库已经通关。' : '每个 Day 的单词全部完全掌握，答完题即可解锁 1 座奖杯。')+'</div>'
       + '</div></div>';
   }
   const plan=coachReply('今天练什么');
   const st=coachCauseStats();
-  const studied=studiedCount(), acc=accuracyAll();
+  const studied=studiedInBook(planBookId()), acc=accuracyAll();
+  const planTotal=planIds().length;
   return '<div class="home-sheet" id="homeSheet" role="dialog" aria-modal="true" aria-label="AI 学习教练">'
     + '<button class="home-sheet-backdrop" data-act="closeHomeSheet" aria-label="关闭 AI 学习教练"></button>'
     + '<div class="home-sheet-card">'
@@ -19397,7 +19518,7 @@ function homeSheetHtml(kind){
     + '<div class="ai-sheet-sub">'+(deepseekReady()?'DeepSeek 已接入 · 按问题发送学习数据':'本地规则智能体 · 不联网')+'</div>'
     + '<div class="ai-sheet-plan"><div class="hs-k">今日建议</div><div class="hs-idea">'+esc(plan.t).replace(/\n/g,'<br>')+'</div></div>'
     + '<div class="ai-sheet-metrics">'
-    +   '<div><span>已学</span><b>'+studied+'<small>/'+N+'</small></b></div>'
+    +   '<div><span>已学</span><b>'+studied+'<small>/'+planTotal+'</small></b></div>'
     +   '<div><span>正确率</span><b>'+acc+'<small>%</small></b></div>'
     +   '<div><span>错题</span><b>'+st.list.length+'</b></div>'
     + '</div>'
@@ -19490,7 +19611,7 @@ function makeQ(i, rnd, pool){
   return {t:'en2cn', i:i, opts:opts, chosen:-1};
 }
 
-function startSession(list, mode, day, label, pool){
+function startSession(list, mode, day, label, pool, book){
   // 题目内容按单词固定生成：同一个词每次都得到同一道题、同一组选项
   const qs = list.map(function(i){
     return makeQ(i, makeRnd(hashStr('q|'+i+'|v3')), pool);
@@ -19500,7 +19621,7 @@ function startSession(list, mode, day, label, pool){
     const j = Math.floor(Math.random()*(k+1));
     const t = qs[k]; qs[k]=qs[j]; qs[j]=t;
   }
-  S = { mode:mode, day:day, label:label, qs:qs, pos:0, ts:Date.now(), ver:'v4' };
+  S = { mode:mode, day:day, label:label, qs:qs, pos:0, ts:Date.now(), ver:'v4', book:(book || (mode==='day'?planBookId():'')) };
   state.session = S;
   sheetOpen = false;
   exitSheetOpen = false;
@@ -19578,13 +19699,14 @@ function finish(){
   });
   if(answered>0) state.dates[todayStr()] = 1;
   const trophyDay = (typeof S.day==='number') ? S.day : -1;
+  const trophyBook = S.book || planBookId();
   let unlocked = null;
-  if(trophyDay>=0 && dayMastered(trophyDay) && !state.trophies[trophyDay]){
-    state.trophies[trophyDay] = Date.now();
-    unlocked = { day:trophyDay, count:trophyCount(), total:state.settings.days };
+  if(trophyDay>=0 && dayMastered(trophyDay, trophyBook) && !hasTrophy(trophyBook, trophyDay)){
+    state.trophies[trophyKey(trophyBook, trophyDay)] = Date.now();
+    unlocked = { day:trophyDay, book:trophyBook, count:trophyCount(trophyBook), total:state.settings.days };
   }
   lastResult = {
-    mode:S.mode, day:S.day, right:right, total:qs.length, answered:answered, ms:Date.now()-S.ts,
+    mode:S.mode, day:S.day, book:trophyBook, right:right, total:qs.length, answered:answered, ms:Date.now()-S.ts,
     trophy:unlocked,
     items:qs.map(function(q){
       return {i:q.i, answered:q.chosen>=0, ok:q.chosen>=0 && q.opts[q.chosen] && q.opts[q.chosen].ok};
@@ -19743,7 +19865,7 @@ function showTrophyAward(aw){
       +   '<div class="ta-rays"></div>'
       +   '<div class="ta-medal">'+ICON.trophy+'</div>'
       +   '<div class="ta-k">TROPHY UNLOCKED</div>'
-      +   '<div class="ta-title">Day '+(aw.day+1)+' 全部掌握</div>'
+      +   '<div class="ta-title">'+planBookLabelFor(aw.book || planBookId())+' Day '+(aw.day+1)+' 全部掌握</div>'
       +   '<div class="ta-sub">第 '+aw.count+' / '+aw.total+' 座奖杯</div>'
       +   '<div class="ta-track"><div class="ta-fill" style="--p:'+pct+'%"></div></div>'
       + '</div>';
@@ -20169,23 +20291,24 @@ function dayCardsHtml(){
 
 function viewHome(){
   const D = state.settings.days;
-  const dm = dayMap(D);
+  const pb = planBookId();
+  const dm = dayMapFor(D, pb);
   const studied = studiedCount();
   const mastered = masteredCount();
   const acc = accuracyAll();
   const streak = calcStreak();
   let doneDays = 0;
-  for(let d=0; d<D; d++){ if(dayProgress(d).done) doneDays++; }
-  const nd = nextDay();
+  for(let d=0; d<D; d++){ if(dayProgress(d,pb).done) doneDays++; }
+  const nd = nextDay(pb);
   const listNow = dm[nd] || [];
   const sess = state.session;
   const ctaBig = sess
     ? ('继续 ' + esc(sess.label) + ' · 第 ' + (sess.pos+1) + '/' + sess.qs.length + ' 题')
-    : ('开始 四级 Day ' + (nd+1) + ' · ' + listNow.length + ' 词');
+    : ('开始 ' + planBookLabelFor(pb) + ' Day ' + (nd+1) + ' · ' + listNow.length + ' 词');
   const ctaMeta = sess
     ? '上次进度已保存，接着练'
     : '题目固定 · 顺序随机 · 不重复';
-  const trophyN = trophyCount();
+  const trophyN = trophyCount(pb);
   const wrongN = Object.keys(state.wrong).length;
   const favN = Object.keys(state.fav).length;
   const totalWords = uniqueWordCount();
@@ -20220,11 +20343,11 @@ function viewHome(){
   +   '<span class="go"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span>'
   + '</button>'
   + '<div class="sect apps-sect">'
-  +   '<div class="apps-h"><h2>学习应用</h2><span>点开查看全部</span></div>'
+  +   '<div class="apps-h"><h2>学习应用</h2><span>点单词本图标切换计划</span></div>'
   +   '<div class="appgrid">'
-  +     '<button class="appic" data-act="nav" data-v="#/plan">'
+  +     '<button class="appic" data-act="homeWidget" data-w="planbook" title="点击选择单词本">'
   +       '<span class="appglyph plan">'+ICON.grid+'<span class="appbadge">'+doneDays+'/'+D+'</span></span>'
-  +       '<span class="appname">四级 '+D+' 天</span></button>'
+  +       '<span class="appname">'+planBookLabelFor(pb)+' '+D+' 天</span></button>'
   +     '<button class="appic" data-act="nav" data-v="#/wrong">'
   +       '<span class="appglyph wrong">'+ICON.wrong+(wrongN?'<span class="appbadge">'+wrongN+'</span>':'')+'</span>'
   +       '<span class="appname">错题本</span></button>'
@@ -20243,11 +20366,11 @@ function viewHome(){
   +   '</div>'
   + '</div>'
   + '<div class="panel bookpanel homebooks">'
-  +   '<div class="bookhead"><div class="bk"><div class="bk-title">单词本出题</div>'
-  +     '<div class="bk-sub">四级、六级各一本，选中后直接出题</div></div></div>'
+  +   '<div class="bookhead"><div class="bk"><div class="bk-title">选单词本出题</div>'
+  +     '<div class="bk-sub">四级、六级各一本，练习会同步切换每日计划</div></div></div>'
   +   homeBooks
   + '</div>'
-  + '<div class="home-note">四级 '+N+' 词'+(cet6N?' · 六级 '+cet6N+' 词':'')+' · A–Z 均分 · 每个词只考一次</div>';
+  + '<div class="home-note">四级 '+N+' 词'+(cet6N?' · 六级 '+cet6N+' 词':'')+' · 当前每日计划：'+planBookLabelFor(pb)+' · 每个词只考一次</div>';
 }
 
 /* ============================================================
@@ -20255,21 +20378,26 @@ function viewHome(){
    ============================================================ */
 function viewPlan(){
   const D = state.settings.days;
+  const pb = planBookId();
   let done = 0;
-  for(let d=0; d<D; d++){ if(dayProgress(d).done) done++; }
-  const mastered = masteredCount();
+  for(let d=0; d<D; d++){ if(dayProgress(d,pb).done) done++; }
+  const mastered = masteredInBook(pb);
   const pct = D ? Math.round(done*100/D) : 0;
   return ''
   + '<div class="topbar">'
   +   '<button class="iconbtn" data-act="nav" data-v="#/home" title="返回">'+ICON.back+'</button>'
-  +   '<div class="topmid"><div class="t">四级 '+D+' 天计划</div><div class="s">已完成 '+done+'/'+D+' 天 · '+mastered+' 词已掌握</div></div>'
+  +   '<div class="topmid"><div class="t">'+planBookLabelFor(pb)+' '+D+' 天计划</div><div class="s">已完成 '+done+'/'+D+' 天 · '+mastered+' 词已掌握</div></div>'
   +   '<button class="modetoggle" data-act="toggleTheme" title="切换白天 / 夜间">'
   +     (state.settings.theme==='dark' ? ICON.moon+'夜间护眼' : ICON.sun+'白天')
   +   '</button>'
   + '</div>'
+  + '<div class="planbook-switch">'
+  +   '<button class="pb'+(pb==='cet4'?' on':'')+'" data-act="setPlanBook" data-b="cet4">四级 · '+N+' 词</button>'
+  +   '<button class="pb'+(pb==='cet6'?' on':'')+'" data-act="setPlanBook" data-b="cet6">六级 · '+CET6_IDS.length+' 词</button>'
+  + '</div>'
   + '<div class="progress plan-progress"><i style="width:'+pct+'%"></i></div>'
   + '<div class="daygrid plan-grid">'+dayCardsHtml()+'</div>'
-  + '<div class="home-note">绿色：全部掌握；橙色：已考未完全掌握。点任意 Day 直接开始。</div>';
+  + '<div class="home-note">'+planBookLabelFor(pb)+'按 A–Z 均分到每天，点任意 Day 直接开始。绿色：全部掌握；橙色：已考未完全掌握。</div>';
 }
 
 /* ============================================================
@@ -20281,13 +20409,13 @@ function viewTrophy(){
   return '<div class="trophy-page">'
   + '<div class="topbar">'
   +   '<button class="iconbtn" data-act="nav" data-v="#/home" title="返回">'+ICON.back+'</button>'
-  +   '<div class="topmid"><div class="t">奖杯收藏</div><div class="s">已获得 '+n+'/'+D+' 座</div></div>'
+  +   '<div class="topmid"><div class="t">'+planBookLabel()+'奖杯收藏</div><div class="s">'+planBookLabel()+' '+D+' 天 · 已获得 '+n+'/'+D+' 座</div></div>'
   +   '<button class="modetoggle" data-act="toggleTheme" title="切换白天 / 夜间">'
   +     (state.settings.theme==='dark' ? ICON.moon+'夜间护眼' : ICON.sun+'白天')
   +   '</button>'
   + '</div>'
   + '<div class="trophy-card trophy-page-card">'
-  +   '<div class="trophy-head"><div><div class="tc-k">TROPHY CASE</div></div>'
+  +   '<div class="trophy-head"><div><div class="tc-k">TROPHY CASE</div><div class="tc-title">'+planBookLabel()+'奖杯</div></div>'
   +     '<div class="tc-count"><b>'+n+'</b><span>/ '+D+'</span></div></div>'
   +   trophyShelfHtml()
   +   '<div class="tc-hint">每个 Day 的单词全部完全掌握，答完题即可解锁 1 座奖杯。</div>'
@@ -20467,6 +20595,7 @@ function viewQuiz(){
    ============================================================ */
 function viewResult(){
   const r = lastResult;
+  const book = r.book || planBookId();
   const answered = r.answered || 0;
   const pct = answered ? Math.round(r.right*100/answered) : 0;
   const wrongItems = r.items.filter(function(x){ return x.answered && !x.ok; });
@@ -20485,13 +20614,13 @@ function viewResult(){
     }).join('');
   }
   const trophyHtml = r.trophy
-    ? '<div class="result-trophy"><div class="rt-ico">'+ICON.trophy+'</div><div class="rt-t"><b>Day '+(r.trophy.day+1)+' 全部掌握</b><span>获得第 '+r.trophy.count+' / '+r.trophy.total+' 座奖杯，已存入收藏</span></div></div>'
+    ? '<div class="result-trophy"><div class="rt-ico">'+ICON.trophy+'</div><div class="rt-t"><b>'+planBookLabelFor(r.trophy.book || book)+' Day '+(r.trophy.day+1)+' 全部掌握</b><span>获得第 '+r.trophy.count+' / '+r.trophy.total+' 座奖杯，已存入收藏</span></div></div>'
     : '';
 
   return ''
   + '<div class="topbar">'
   +   '<button class="iconbtn" data-act="home" title="返回首页">'+ICON.back+'</button>'
-  +   '<div class="topmid"><div class="t">'+(r.mode==='day'?('Day '+(r.day+1)+' 结果'):'练习结果')+'</div><div class="s">用时 '+fmtTime(r.ms)+'</div></div>'
+  +   '<div class="topmid"><div class="t">'+(r.mode==='day'?(planBookLabelFor(book)+' Day '+(r.day+1)+' 结果'):'练习结果')+'</div><div class="s">用时 '+fmtTime(r.ms)+'</div></div>'
   +   '<div class="clock">连续 '+streak+' 天</div>'
   + '</div>'
   + '<div class="hero">'
@@ -20775,8 +20904,9 @@ function bookRowHtml(b){
   });
   const tag = b.tag || (b.id==='cet4'?'四级':(b.id==='cet6'?'六级':'自定义'));
   const tagCls = tag==='四六级'?'lv46':(tag==='四级'?'lv4':(tag==='六级'?'lv6':'lvc'));
+  const isPlan = b.builtin && b.id===planBookId();
   const meta = n
-    ? (n+' 词'+(done?' · 练过 '+done:'')+(mastered?' · 已掌握 '+mastered:''))
+    ? (n+' 词'+(done?' · 练过 '+done:'')+(mastered?' · 已掌握 '+mastered:'')+(isPlan?' · 当前每日计划':''))
     : (b.id==='cet6' ? 'CET-6 · 等待导入六级词库' : '还没有词');
   return '<div class="bookrow">'
     + '<div class="bk-ic">'+ICON.book+'</div>'
@@ -20922,6 +21052,7 @@ function importBookText(filename, text){
 }
 function startCustomBook(book){
   if(!book) return;
+  if(book.builtin && (book.id==='cet4' || book.id==='cet6')){ state.planBook = book.id; save(); }
   const begin = function(){
     let list = bookIds(book);
     if(!list.length){ toast(book.id==='cet6'?'六级词库还没有导入单词':'这个单词本还没有可练习的词'); return; }
@@ -21139,16 +21270,16 @@ function coachWordAnswer(q){
 function coachReply(q){
   const ql = q.toLowerCase();
   const st = coachCauseStats();
-  const studied = studiedCount();
+  const studied = studiedInBook(planBookId());
   const acc = accuracyAll();
   const nd = nextDay();
-  const nextLabel = 'Day '+(nd+1);
+  const nextLabel = planBookLabel()+' Day '+(nd+1);
 
   if(/^(你是谁|你能做什么|怎么用|帮助|介绍)/.test(q)){
     return { t:'我是这台设备里的离线学习教练。我会读你的已学词、正确率、错题本和选错项，帮你判断错因、安排下一步、挑出高危词。\n可以直接问：今天练什么、诊断我的错题、我最薄弱的词、sensation 怎么记。', a:[] };
   }
   if(/正确率|进度|统计|学了多少|怎么样/.test(q)){
-    let t = '当前已学 '+studied+'/'+N+'，正确率 '+acc+'%，错题 '+st.list.length+' 个。';
+    let t = '当前已学 '+studied+'/'+planIds().length+'，正确率 '+acc+'%，错题 '+st.list.length+' 个。';
     if(st.list.length) t += '\n错因：近义/形近干扰 '+st.near+' 个，记忆偏差 '+st.far+' 个，缺少选错项记录 '+st.unknown+' 个。';
     return { t:t, a: st.list.length ? [{act:'wrongAll',label:'去练错题'}] : [{act:'day',d:nd,label:'开始 '+nextLabel}] };
   }
@@ -21235,10 +21366,10 @@ function matchWordInQuery(q){
 }
 function deepseekContext(q){
   const st = coachCauseStats();
-  const studied = studiedCount();
+  const studied = studiedInBook(planBookId());
   const acc = accuracyAll();
   const lines = [
-    '已学 '+studied+'/'+N+'，正确率 '+acc+'%，错题 '+st.list.length+' 个。',
+    '当前每日计划：'+planBookLabel()+'，已学 '+studied+'/'+planIds().length+'，正确率 '+acc+'%，错题 '+st.list.length+' 个。',
     '错因：近义/形近 '+st.near+'，记忆偏差 '+st.far+'，无选错记录 '+st.unknown+'。'
   ];
   const top = coachTopWrong(8);
@@ -21388,7 +21519,7 @@ function viewAnalysis(){
     +   '<div class="topmid"><div class="t">AI 学习教练</div><div class="s">离线语义模型</div></div></div>'
     + '<div class="empty"><div class="big">分析数据还没生成</div>重新构建一次产物即可带上词向量</div>';
   }
-  const studied = studiedCount();
+  const studied = studiedInBook(planBookId());
   const acc = accuracyAll();
   const wrongList = Object.keys(state.wrong).map(Number);
   const clusters = AI.cl;
@@ -21444,7 +21575,7 @@ function viewAnalysis(){
   + '</div>'
   + coach
   + '<div class="stats" style="margin-top:0">'
-  +   '<div class="stat"><div class="k">已学</div><div class="v">'+studied+'<small>/'+N+'</small></div></div>'
+  +   '<div class="stat"><div class="k">已学</div><div class="v">'+studied+'<small>/'+planIds().length+'</small></div></div>'
   +   '<div class="stat"><div class="k">正确率</div><div class="v">'+acc+'<small>%</small></div></div>'
   +   '<div class="stat"><div class="k">错题</div><div class="v">'+wrongList.length+'<small>个</small></div></div>'
   +   '<div class="stat"><div class="k">易混簇</div><div class="v">'+clCount+'<small>组</small></div></div>'
@@ -22040,7 +22171,8 @@ function applyImportedState(s){
   if(typeof state.customSeq!=='number' || state.customSeq<CUSTOM_BASE) state.customSeq=CUSTOM_BASE;
   state.session = null;
   S = null; lastResult = null;
-  DAY_CACHE.D=0; seedTrophies(); rebuildCustomIndex();
+  DAY_CACHE = {};
+  seedTrophies(); rebuildCustomIndex();
   save(); render();
 }
 function copyText(text){
@@ -22198,19 +22330,27 @@ document.addEventListener('click', function(e){
     return;
   }
   if(act==='wordBack'){ go(wordBack || '#/home'); return; }
+  if(act==='setPlanBook'){
+    const b = el.getAttribute('data-b');
+    if(b!=='cet4' && b!=='cet6') return;
+    applyPlanBookSelection(b);
+    return;
+  }
+  if(act==='planBookView'){ closeHomeSheet(); go('#/plan'); return; }
   if(act==='day'){
     const d = parseInt(el.getAttribute('data-d'),10);
+    const pb = planBookId();
     const cur = state.session;
-    const unfinished = cur && cur.mode==='day' && cur.day===d && cur.qs.some(function(q){ return q.chosen<0; });
+    const unfinished = cur && cur.mode==='day' && (cur.book || 'cet4')===pb && cur.day===d && cur.qs.some(function(q){ return q.chosen<0; });
     if(unfinished){
       const left = cur.qs.filter(function(q){ return q.chosen<0; }).length;
-      showDialog('Day '+(d+1)+' 还有未完成的进度', '还有 '+left+' 题没答完。\n接着上次继续：题序和位置不变；重新打乱：从第一题开始新一轮。', '接着上次', '重新打乱', function(ok){
+      showDialog(planBookLabelFor(pb)+' Day '+(d+1)+' 还有未完成的进度', '还有 '+left+' 题没答完。\n接着上次继续：题序和位置不变；重新打乱：从第一题开始新一轮。', '接着上次', '重新打乱', function(ok){
         if(ok){ S = cur; go('#/quiz'); }
-        else { startSession(dayList(d), 'day', d, 'Day '+(d+1)); }
+        else { startSession(dayListFor(pb,d), 'day', d, planBookLabelFor(pb)+' Day '+(d+1), planIdsFor(pb), pb); }
       });
       return;
     }
-    startSession(dayList(d), 'day', d, 'Day '+(d+1));
+    startSession(dayListFor(pb,d), 'day', d, planBookLabelFor(pb)+' Day '+(d+1), planIdsFor(pb), pb);
     return;
   }
   if(act==='exitQuiz'){ exitSheetOpen=true; sheetOpen=false; render(); return; }
@@ -22243,7 +22383,8 @@ document.addEventListener('click', function(e){
     if(!lastResult) return;
     const idxs = lastResult.items.filter(function(x){ return !x.answered; }).map(function(x){ return x.i; });
     if(!idxs.length) return;
-    startSession(idxs, 'skip', lastResult.day, 'Day '+(lastResult.day+1)+' · 补答');
+    const b = lastResult.book || planBookId();
+    startSession(idxs, 'skip', lastResult.day, planBookLabelFor(b)+' Day '+(lastResult.day+1)+' · 补答', planIdsFor(b), b);
     return;
   }
   if(act==='answer'){
@@ -22268,7 +22409,9 @@ document.addEventListener('click', function(e){
     if(!lastResult) return;
     const idxs = lastResult.items.filter(function(x){ return !x.ok; }).map(function(x){ return x.i; });
     if(!idxs.length) return;
-    startSession(idxs, 'wrong', lastResult.day, '错题重练');
+    const b = lastResult.book || planBookId();
+    const label = lastResult.mode==='day' ? (planBookLabelFor(b)+' Day '+(lastResult.day+1)+' · 错题重练') : '错题重练';
+    startSession(idxs, 'wrong', lastResult.day, label, planIdsFor(b), b);
     return;
   }
   if(act==='wrongAll'){
@@ -22304,7 +22447,7 @@ document.addEventListener('click', function(e){
     const d=parseInt(el.getAttribute('data-d'),10);
     if(d===state.settings.days) return;
     state.settings.days=d; state.days={}; state.trophies={}; state.session=null; S=null;
-    DAY_CACHE.D=0; seedTrophies(); save(); render(); return;
+    DAY_CACHE = {}; seedTrophies(); save(); render(); return;
   }
   if(act==='checkUpdate'){ checkUpdate(); return; }
   if(act==='saveUpdateSrc'){
