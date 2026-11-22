@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>单词大师 · 四级 / 六级</title>
 <meta name="application-name" content="单词大师">
-<meta name="app-version" content="2026.11.22.5">
+<meta name="app-version" content="2026.11.22.6">
 <meta name="app-build-date" content="2026-11-22">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23007AFF'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='19' font-weight='600' fill='%23FFFFFF' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
 <style>
@@ -721,7 +721,10 @@ body.dark .liball.on{background:var(--accent);color:#fff}
 .bookhead .bk{flex:1;min-width:0}
 .bk-title{font-size:15px;font-weight:700;letter-spacing:-.4px;color:var(--ink)}
 .bk-sub{font-size:11.5px;line-height:1.45;color:var(--muted);margin-top:2px}
-.bookrow{display:flex;align-items:center;gap:9px;padding-top:11px;margin-top:11px;border-top:1px solid var(--line)}
+.bookrow{display:flex;align-items:center;gap:9px;padding:9px 7px;margin:7px -7px 0;border-top:1px solid var(--line);border-radius:10px;cursor:pointer;transition:background .16s,border-color .16s}
+.bookrow.on{background:var(--accent-soft);border-top-color:transparent;box-shadow:inset 0 0 0 1px rgba(10,132,255,.16)}
+.bookrow.on .bk-ic{background:var(--accent);color:#fff}
+body.dark .bookrow.on{background:rgba(10,132,255,.16);box-shadow:inset 0 0 0 1px rgba(100,181,255,.30)}
 .bk-ic{flex:0 0 31px;width:31px;height:31px;border-radius:9px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
 .bk-ic svg{width:16px;height:16px}
 .bk-info{flex:1;min-width:0}
@@ -18932,7 +18935,7 @@ const EXAMPLES = {"abandon":[["v.",[["He claimed that his parents had abandoned 
    ============================================================ */
 const N = WORDS.length;
 const LS_KEY = 'cet4vocab_20d_v1';
-const APP_VERSION = '2026.11.22.5';
+const APP_VERSION = '2026.11.22.6';
 const APP_VERSION_DATE = '2026-11-22';
 const UPDATE_DEFAULT_SRC = 'https://zhaowenhan371-blip.github.io/word-master/update.json';
 let updateFound = null;
@@ -20710,16 +20713,41 @@ function viewFav(){
 /* ============================================================
    视图：词库
    ============================================================ */
-const lib = { q:'', letter:'ALL', limit:120, open:{} };
+const lib = { q:'', letter:'ALL', limit:120, open:{}, book:'' };
+
+function libBookObj(){
+  const books = allBooks();
+  if(lib.book){
+    for(let i=0;i<books.length;i++){ if(books[i].id===lib.book) return books[i]; }
+  }
+  const pid = planBookId();
+  for(let i=0;i<books.length;i++){ if(books[i].id===pid) return books[i]; }
+  return books[0] || null;
+}
+function libBookIds(){
+  const b = libBookObj();
+  return b ? bookIds(b) : libAllIds();
+}
+function libBookId(){
+  const b = libBookObj();
+  return b ? b.id : planBookId();
+}
+function libBookLabel(){
+  const b = libBookObj();
+  if(!b) return planBookLabel();
+  return b.tag || (b.id==='cet4'?'四级':(b.id==='cet6'?'六级':b.name));
+}
 
 function libFilter(){
   const q = lib.q.trim().toLowerCase();
-  const ids = libAllIds();
+  const ids = (q ? libAllIds() : libBookIds()).slice().sort(function(a,b){
+    return (WORDS[a][0]||'').toLowerCase().localeCompare((WORDS[b][0]||'').toLowerCase());
+  });
   if(!q){
     if(lib.letter!=='ALL') return ids.filter(function(i){ return letterOf(i)===lib.letter; });
     return ids;
   }
-  // 有关键词时全词库检索，不受字母筛选限制，避免“词库明明有却提示去有道”
+  // 有关键词时全词库检索，不受当前单词本和字母筛选限制，避免“词库明明有却提示去有道”
   const out=[];
   ids.forEach(function(i){
     if((WORDS[i][0]||'').toLowerCase().indexOf(q)>=0 || (WORDS[i][3]||'').toLowerCase().indexOf(q)>=0) out.push(i);
@@ -20762,7 +20790,7 @@ function renderLibList(){
     if(q){
       box.innerHTML = '<div class="empty">'
         + '<div class="big">词库里没有 “'+esc(q)+'”</div>'
-        + '<div class="hint">已优先搜索本地 '+N+' 个词，没有匹配项。可以前往有道词典查看完整释义。</div>'
+        + '<div class="hint">已优先搜索本地 '+uniqueWordCount()+' 个词，没有匹配项。可以前往有道词典查看完整释义。</div>'
         + '<a class="youdao-go" href="'+esc(youdaoUrl(q))+'" target="_blank" rel="noopener">'+ICON.ext+' 前往有道查看</a>'
         + '</div>';
     } else {
@@ -20865,19 +20893,20 @@ function viewLib(){
   }).join('');
   const books = allBooks();
   const bookRows = books.map(bookRowHtml).join('');
+  const bookN = libBookIds().length;
 
   setTimeout(function(){ renderLibList(); },0);
 
   return ''
   + '<div class="topbar">'
   +   '<button class="iconbtn" data-act="home">'+ICON.back+'</button>'
-  +   '<div class="topmid"><div class="t">词库</div><div class="s">'+uniqueWordCount()+' 词 · 四级 / 六级 · 字母定位</div></div>'
-  +   '<button class="liball'+(lib.letter==='ALL'?' on':'')+'" data-act="libLetter" data-l="ALL">全部</button>'
+  +   '<div class="topmid"><div class="t">词库</div><div class="s">'+esc(libBookLabel())+' · '+bookN+' 词 · 字母定位</div></div>'
+  +   '<button class="liball'+(lib.letter==='ALL'?' on':'')+'" data-act="libLetter" data-l="ALL" title="显示全部字母">A–Z</button>'
   + '</div>'
   + '<input class="search" id="libq" data-role="libq" placeholder="搜单词或中文释义…" value="'+esc(lib.q)+'" autocomplete="off">'
   + '<div class="panel bookpanel">'
-  +   '<div class="bookhead"><div class="bk"><div class="bk-title">单词本</div>'
-  +     '<div class="bk-sub">四级、六级分开装；选一本单独出题</div></div>'
+  +   '<div class="bookhead"><div class="bk"><div class="bk-title">选择单词本</div>'
+  +     '<div class="bk-sub">点一本，下面只看该等级词汇</div></div>'
   +     '<button class="minilink" data-act="bookImport">+ 导入自定义</button></div>'
   +   (bookRows || '<div class="bookempty">还没有单词本。</div>')
   +   '<input type="file" id="bookFile" accept=".json,.csv,.txt,application/json,text/csv,text/plain" style="display:none">'
@@ -20898,11 +20927,11 @@ function bookRowHtml(b){
   });
   const tag = b.tag || (b.id==='cet4'?'四级':(b.id==='cet6'?'六级':'自定义'));
   const tagCls = tag==='四六级'?'lv46':(tag==='四级'?'lv4':(tag==='六级'?'lv6':'lvc'));
-  const isPlan = b.builtin && b.id===planBookId();
+  const selected = b.id===libBookId();
   const meta = n
-    ? (n+' 词'+(done?' · 练过 '+done:'')+(mastered?' · 已掌握 '+mastered:'')+(isPlan?' · 当前每日计划':''))
+    ? (n+' 词'+(done?' · 练过 '+done:'')+(mastered?' · 已掌握 '+mastered:'')+(selected?' · 正在显示':''))
     : (b.id==='cet6' ? 'CET-6 · 等待导入六级词库' : '还没有词');
-  return '<div class="bookrow">'
+  return '<div class="bookrow'+(selected?' on':'')+'" data-act="libBook" data-b="'+esc(b.id)+'" role="button" tabindex="0" aria-selected="'+(selected?'true':'false')+'">'
     + '<div class="bk-ic">'+ICON.book+'</div>'
     + '<div class="bk-info"><div class="bk-name">'+esc(b.name)+' <span class="chip '+tagCls+' bktag">'+esc(tag)+'</span></div>'
     +   '<div class="bk-meta">'+meta+'</div></div>'
@@ -21040,6 +21069,7 @@ function importBookText(filename, text){
   state.customSeq = seq;
   state.customBooks.push(book);
   rebuildCustomIndex();
+  lib.book = book.id; lib.q = ''; lib.letter = 'ALL'; lib.limit = 120; lib.open = {};
   save(); render();
   toast('已导入「'+book.name+'」'+book.words.length+' 词'+(parsed.truncated?'（超出 5000，只保留前 5000）':''));
   return book;
@@ -22431,6 +22461,12 @@ document.addEventListener('click', function(e){
     return;
   }
   if(act==='libLetter'){ selectLibLetter(el.getAttribute('data-l')); return; }
+  if(act==='libBook'){
+    const id=el.getAttribute('data-b');
+    if(!id) return;
+    lib.book=id; lib.q=''; lib.letter='ALL'; lib.limit=120; lib.open={};
+    go('#/lib'); return;
+  }
   if(act==='libRow'){
     const i=parseInt(el.getAttribute('data-i'),10);
     if(lib.open[i]) delete lib.open[i]; else lib.open[i]=1;
@@ -22507,7 +22543,7 @@ document.addEventListener('click', function(e){
     startCustomBook(b);
     return;
   }
-  if(act==='customDelete'){ deleteCustomBook(el.getAttribute('data-b')); return; }
+  if(act==='customDelete'){ const id=el.getAttribute('data-b'); if(lib.book===id) lib.book=''; deleteCustomBook(id); return; }
   if(act==='wallUpload'){
     const f = document.getElementById('wallFile');
     if(f){ f.value=''; f.click(); }
