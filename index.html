@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>单词大师 · 四级 / 六级</title>
 <meta name="application-name" content="单词大师">
-<meta name="app-version" content="2026.11.22.9">
+<meta name="app-version" content="2026.11.22.10">
 <meta name="app-build-date" content="2026-11-22">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23007AFF'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='19' font-weight='600' fill='%23FFFFFF' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
 <style>
@@ -19096,7 +19096,7 @@ const EXAMPLES = {"abandon":[["v.",[["He claimed that his parents had abandoned 
    ============================================================ */
 const N = WORDS.length;
 const LS_KEY = 'cet4vocab_20d_v1';
-const APP_VERSION = '2026.11.22.9';
+const APP_VERSION = '2026.11.22.10';
 const APP_VERSION_DATE = '2026-11-22';
 const UPDATE_DEFAULT_SRC = 'https://zhaowenhan371-blip.github.io/word-master/update.json';
 let updateFound = null;
@@ -19430,6 +19430,7 @@ function refineNormalizeState(){
   p.totalDays = Math.max(1, Math.ceil(p.ids.length/p.daily));
   p.curDay = Math.max(0, Math.min(p.totalDays-1, Math.floor(Number(p.curDay)||0)));
   if(!p.seen || typeof p.seen!=='object') p.seen = {};
+  if(!p.rev || typeof p.rev!=='object') p.rev = {};
   p.finished = !!p.finished;
   if(p.finished) p.curDay = p.totalDays-1;
 }
@@ -19455,6 +19456,10 @@ function refinePickType(p,i){
   }
   return '';
 }
+function refinePickTypes(p,i){
+  const order = refineTypeOrder(i);
+  return order.filter(function(t){ return !p.seen[refineSeenKey(i,t)]; });
+}
 function refineNewIds(p,d){
   if(!p || !p.ids || d<0 || d>=p.totalDays) return [];
   return p.ids.slice(d*p.daily, Math.min(p.ids.length, (d+1)*p.daily));
@@ -19466,13 +19471,13 @@ function refineReviewIds(p,d){
 function refineNewDone(p,d){
   const list = refineNewIds(p,d);
   if(!list.length) return false;
-  return list.every(function(i){ return refineSeenCount(p,i)>=1; });
+  return list.every(function(i){ return refineSeenCount(p,i)>=REFINE_TYPES.length; });
 }
 function refineReviewDone(p,d){
   if(d<=0) return true;
   const list = refineReviewIds(p,d);
   if(!list.length) return true;
-  return list.every(function(i){ return refineSeenCount(p,i)>=2; });
+  return list.every(function(i){ return !!(p.rev && p.rev[i]); });
 }
 function refineDayDone(p,d){
   return refineNewDone(p,d) && refineReviewDone(p,d);
@@ -19546,10 +19551,10 @@ function refineMaskHtml(mask){
     return '<span class="rf-letter">'+esc(ch)+'</span>';
   }).join('');
 }
-function refineMakeQ(i,t,pool){
+function refineMakeQ(i,t,pool,salt){
   const it = WORDS[i];
   if(!it) return null;
-  const rnd = makeRnd(hashStr('refineq|'+i+'|'+t));
+  const rnd = makeRnd(hashStr('refineq|'+i+'|'+t+(salt?'|'+salt:'')));
   if(t==='en2cn'){
     const q = makeQ(i, rnd, pool);
     q.t='en2cn';
@@ -19594,19 +19599,31 @@ function refineMakeQ(i,t,pool){
     opts:[{text:word, ok:true, i:i, pos:it[2]}, {text:'', ok:false, i:-1, pos:''}]
   };
 }
-function refineBuildQs(ids, pool, doneCount){
+function refineBuildQs(ids, pool, kind, day){
   const p=state.refine;
   const qs=[];
   if(!p) return qs;
   (ids||[]).forEach(function(i){
     if(!WORDS[i]) return;
-    if(refineSeenCount(p,i) >= (doneCount||1)) return;
-    const t = refinePickType(p,i);
-    if(!t) return;
-    const q = refineMakeQ(i,t,pool || p.ids);
-    if(!q) return;
-    q.key = refineSeenKey(i,t);
-    qs.push(q);
+    if(kind==='review'){
+      if(p.rev && p.rev[i]) return;
+      const order = refineTypeOrder(i);
+      const t = order[(hashStr('refiner|'+i+'|'+(day||0))>>>0) % order.length];
+      const q = refineMakeQ(i,t,pool || p.ids,'r'+(day||0));
+      if(!q) return;
+      q.key = String(day||0)+'|r|'+refineSeenKey(i,t);
+      q.rev = 1;
+      q.revDay = day||0;
+      qs.push(q);
+      return;
+    }
+    const types = refinePickTypes(p,i);
+    types.forEach(function(t){
+      const q = refineMakeQ(i,t,pool || p.ids,'n'+(day||0));
+      if(!q) return;
+      q.key = refineSeenKey(i,t);
+      qs.push(q);
+    });
   });
   for(let k=qs.length-1;k>0;k--){
     const j=Math.floor(Math.random()*(k+1));
@@ -19630,7 +19647,7 @@ function startRefine(kind){
   if(kind==='review' && day<=0){ toast('Day 1 先学新词，明天开始滚动复习'); return; }
   if(kind==='review' && refineReviewDone(p,day)){ toast('今天的复习已经完成了'); return; }
   const ids = kind==='new' ? refineNewIds(p,day) : refineReviewIds(p,day);
-  const qs = refineBuildQs(ids, p.ids, kind==='new'?1:2);
+  const qs = refineBuildQs(ids, p.ids, kind, day);
   if(!qs.length){ toast('这一组词已经全部练过'); return; }
   const label = '精炼 · Day '+(day+1)+' · '+(kind==='new'?'新词':'复习');
   startQs(qs, 'refine', -1, label, { refineDay:day, refineKind:kind, book:'' });
@@ -19645,7 +19662,7 @@ function refineCreatePlan(){
   const totalDays = Math.max(1, Math.ceil(ids.length/daily));
   state.refine = {
     books:books, daily:daily, ids:ids, totalDays:totalDays,
-    curDay:0, seen:{}, finished:false, createdAt:Date.now(), updatedAt:Date.now()
+    curDay:0, seen:{}, rev:{}, finished:false, createdAt:Date.now(), updatedAt:Date.now()
   };
   state.refineCfg = { books:books, daily:daily };
   if(state.session && state.session.mode==='refine'){ state.session=null; S=null; }
@@ -20114,6 +20131,10 @@ function revertAnswer(q){
 
 function markRefineSeen(q){
   if(!S || S.mode!=='refine' || !state.refine || !q) return;
+  if(q.revDay!=null && q.rev){
+    state.refine.rev[String(q.i)] = 1;
+    return;
+  }
   const key = q.key || refineSeenKey(q.i, q.t);
   if(key) state.refine.seen[key]=1;
 }
@@ -20178,6 +20199,24 @@ function nextQuestion(){
   }
   finish();
 }
+function refineAutoWrong(qs){
+  return (qs||[]).filter(function(q){
+    if(!q || q.chosen<0) return false;
+    return !(q.opts && q.opts[q.chosen] && q.opts[q.chosen].ok);
+  });
+}
+function refineRetryClone(q){
+  const n={};
+  Object.keys(q).forEach(function(k){
+    if(k==='opts') n.opts=q.opts.map(function(o){ return Object.assign({},o); });
+    else if(k==='prev' || k==='peek') n[k]=null;
+    else n[k]=q[k];
+  });
+  n.chosen=-1;
+  n.draft='';
+  n.answerText='';
+  return n;
+}
 function finish(){
   if(!S) return;
   const qs = S.qs;
@@ -20187,6 +20226,25 @@ function finish(){
     answered++;
     if(q.opts[q.chosen] && q.opts[q.chosen].ok) right++;
   });
+  if(S.mode==='refine'){
+    const wrong = refineAutoWrong(qs);
+    if(wrong.length){
+      const retryQs = wrong.map(refineRetryClone);
+      for(let k=retryQs.length-1;k>0;k--){
+        const j=Math.floor(Math.random()*(k+1));
+        const t=retryQs[k]; retryQs[k]=retryQs[j]; retryQs[j]=t;
+      }
+      const round=(S.retryRound||0)+1;
+      const rootWrong=S.autoRootWrong||wrong.length;
+      const label='精炼 · Day '+((S.refineDay||0)+1)+' · 错题重练'+(round>1?' '+round:'');
+      startQs(retryQs, 'refine', -1, label, {
+        refineDay:S.refineDay, refineKind:S.refineKind, book:'',
+        autoRetry:true, retryRound:round, autoRootWrong:rootWrong
+      });
+      toast('还有 '+wrong.length+' 道错题，自动再练一遍');
+      return;
+    }
+  }
   if(answered>0) state.dates[todayStr()] = 1;
   const isRefine = S.mode==='refine';
   const trophyDay = (!isRefine && typeof S.day==='number') ? S.day : -1;
@@ -20199,6 +20257,7 @@ function finish(){
   lastResult = {
     mode:S.mode, day:S.day, book:trophyBook, right:right, total:qs.length, answered:answered, ms:Date.now()-S.ts,
     trophy:unlocked, refineDay:S.refineDay, refineKind:S.refineKind,
+    autoRetry:!!S.autoRetry, retryRound:S.retryRound||0, autoRootWrong:S.autoRootWrong||0,
     items:qs.map(function(q){
       return {i:q.i, answered:q.chosen>=0, ok:q.chosen>=0 && q.opts[q.chosen] && q.opts[q.chosen].ok};
     })
@@ -20895,7 +20954,7 @@ function refineEntryHtml(){
   const p = state.refine;
   let side='制定计划', sub='选单词本与每日新词量';
   if(p){
-    sub = refineBookLabel(p.books)+' · 每天 '+p.daily+' 新词 · 次日复习';
+    sub = refineBookLabel(p.books)+' · 每天 '+p.daily+' 新词 · 三题型';
     if(p.finished) side='已完成';
     else if(state.session && state.session.mode==='refine') side='继续';
     else side='Day '+(p.curDay+1)+' / '+p.totalDays;
@@ -20916,7 +20975,7 @@ function refineConfigHtml(){
   +   '<div class="panel rf-intro">'
   +     '<div class="rf-kicker">REFINE</div>'
   +     '<h2>每天一点，隔天回看</h2>'
-  +     '<p>选一本或两本全练，按每日新词量切成计划。每个词先学一次，第二天换一种题型复习；同一道题在计划里不会重复。</p>'
+  +     '<p>选一本或两本全练，按每日新词量切成计划。每个新词当天把单词选汉语、汉语选单词、补拼写各练一遍；第二天滚动复习；答错会在本组结束后自动重练。</p>'
   +   '</div>'
   +   '<div class="panel">'
   +     '<div class="rf-block">'
@@ -20938,7 +20997,7 @@ function refineConfigHtml(){
               return '<button class="rf-preset'+(daily===n?' on':'')+'" data-act="refineDailyChip" data-n="'+n+'">'+n+'</button>';
             }).join('')+'</div>'
   +     '</div>'
-  +     '<div class="rf-summary">'+esc(refineBookLabel(cfg.books))+' · '+count+' 词 · 约 '+days+' 天 · 每天 '+daily+' 新词 + 次日复习。Day 1 只有新词，Day 2 开始新学与滚动复习分别入口。</div>'
+  +     '<div class="rf-summary">'+esc(refineBookLabel(cfg.books))+' · '+count+' 词 · 约 '+days+' 天 · 每天 '+daily+' 新词，每个词三种题型各一遍。Day 1 只学新词，Day 2 开始新学与滚动复习分别入口。</div>'
   +     '<button class="primary rf-create" data-act="refineCreate">制定精炼计划</button>'
   +   '</div>'
   + '</div>';
@@ -20949,7 +21008,7 @@ function refineDoneHtml(p){
   + '<div class="rf-hero panel">'
   +   '<div class="rf-hero-top"><span>PLAN COMPLETE</span><em>'+doneDays+' / '+p.totalDays+' 天</em></div>'
   +   '<h2>这一轮精炼完成了</h2>'
-  +   '<p>'+esc(refineBookLabel(p.books))+' · '+p.ids.length+' 词，每个词都走过新学和次日复习，同一道题没有重复。</p>'
+  +   '<p>'+esc(refineBookLabel(p.books))+' · '+p.ids.length+' 词，每个词都练过三种题型，并在第二天复习；答错的词会自动重练到答对。</p>'
   +   '<div class="rf-stats">'
   +     '<div class="rf-stat"><b>'+p.ids.length+'</b><span>计划总词</span></div>'
   +     '<div class="rf-stat"><b>'+p.totalDays+'</b><span>完成天数</span></div>'
@@ -20989,14 +21048,14 @@ function refineDashboardHtml(){
   if(newActive){
     newCard = '<button class="continue" data-act="refineStartNew">'
       + '<div><div class="lbl">NEW WORDS · CONTINUE</div><div class="big">继续 Day '+(day+1)+' 新词 · 第 '+(active.pos+1)+'/'+active.qs.length+' 题</div>'
-      + '<div class="meta">三种题型随机出现</div></div>'
+      + '<div class="meta">三种题型各一遍 · 共 '+(active.qs.length)+' 题</div></div>'
       + '<span class="go"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span></button>';
   } else if(newDone){
-    newCard = '<div class="rf-done"><span class="ic">✓</span><span class="tx"><b>今天的新词已完成</b><span>'+newIds.length+' 个词已经学过</span></span></div>';
+    newCard = '<div class="rf-done"><span class="ic">✓</span><span class="tx"><b>今天的新词已完成</b><span>'+newIds.length+' 个词 · 三种题型都练完了</span></span></div>';
   } else {
     newCard = '<button class="continue" data-act="refineStartNew">'
       + '<div><div class="lbl">NEW WORDS</div><div class="big">Day '+(day+1)+' 新词 · '+newIds.length+' 词</div>'
-      + '<div class="meta">单词选汉语 / 汉语选单词 / 补拼写</div></div>'
+      + '<div class="meta">单词选汉语 / 汉语选单词 / 补拼写 · 共 '+(newIds.length*REFINE_TYPES.length)+' 题</div></div>'
       + '<span class="go"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span></button>';
   }
 
@@ -21006,14 +21065,14 @@ function refineDashboardHtml(){
   } else if(reviewActive){
     reviewCard = '<button class="continue rf-review" data-act="refineStartReview">'
       + '<div><div class="lbl">REVIEW · CONTINUE</div><div class="big">继续 Day '+(day+1)+' 复习 · 第 '+(active.pos+1)+'/'+active.qs.length+' 题</div>'
-      + '<div class="meta">换一种题型回看昨天的词</div></div>'
+      + '<div class="meta">换一组选项回看昨天的词</div></div>'
       + '<span class="go"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span></button>';
   } else if(reviewDone){
     reviewCard = '<div class="rf-done"><span class="ic">✓</span><span class="tx"><b>今天的滚动复习已完成</b><span>'+reviewIds.length+' 个昨天的词已经回看</span></span></div>';
   } else {
     reviewCard = '<button class="continue rf-review" data-act="refineStartReview">'
       + '<div><div class="lbl">REVIEW</div><div class="big">滚动复习 · '+reviewIds.length+' 词</div>'
-      + '<div class="meta">昨天学过的词 · 换一种题型 · 不重复原题</div></div>'
+      + '<div class="meta">昨天学过的词 · 随机题型 · 错题自动重练</div></div>'
       + '<span class="go"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span></button>';
   }
 
@@ -21029,12 +21088,11 @@ function refineDashboardHtml(){
   +   '</div>'
   +   '<div class="progress rf-progress"><i style="width:'+Math.min(100,Math.max(pct,1))+'%"></i></div>'
   + '</div>'
-  + activeHtml
   + (activeHtml?'<div class="rf-section-h"><b>今日任务</b><span>可以分开做</span></div>':'')
   + newCard
   + '<div style="height:9px"></div>'
   + reviewCard
-  + '<div class="rf-note">第一天学新词，第二天滚动复习昨天的词。新学和复习是两组独立题目，同一个词在计划内最多出现两次，且题型不同。</div>'
+  + '<div class="rf-note">每个新词当天把三种题型各练一遍，第二天再滚动复习；本组答错的题会在交卷后自动重新练，直到全部答对。</div>'
   + '<div class="btnrow rf-bottom"><button class="ghost" data-act="refineReplan" style="width:100%">重新制定计划</button></div>';
 }
 function viewRefine(){
@@ -21304,7 +21362,7 @@ function viewResult(){
   return ''
   + '<div class="topbar">'
   +   '<button class="iconbtn" data-act="'+(isRefine?'nav':'home')+'"'+(isRefine?' data-v="#/refine"':'')+' title="返回">'+ICON.back+'</button>'
-  +   '<div class="topmid"><div class="t">'+(isRefine?('精炼 Day '+((r.refineDay||0)+1)+' · '+(r.refineKind==='review'?'复习':'新词')+'结果'):(r.mode==='day'?(planBookLabelFor(book)+' Day '+(r.day+1)+' 结果'):'练习结果'))+'</div><div class="s">用时 '+fmtTime(r.ms)+'</div></div>'
+  +   '<div class="topmid"><div class="t">'+(isRefine?('精炼 Day '+((r.refineDay||0)+1)+' · '+(r.autoRetry?'错题重练':(r.refineKind==='review'?'复习':'新词'))+'结果'):(r.mode==='day'?(planBookLabelFor(book)+' Day '+(r.day+1)+' 结果'):'练习结果'))+'</div><div class="s">用时 '+fmtTime(r.ms)+'</div></div>'
   +   '<div class="clock">连续 '+streak+' 天</div>'
   + '</div>'
   + '<div class="hero">'
@@ -21322,7 +21380,7 @@ function viewResult(){
   + '</div>'
   + '<div class="panel"><h3>错题回顾</h3>'+wrongHtml+'</div>'
   + (isRefine
-      ? '<div class="note">精炼结果已记入学习记录；未答的词不会算作已学，回到精炼页可以继续补完这一组。</div>'
+      ? '<div class="note">'+(r.autoRetry?'本组结束后，'+(r.autoRootWrong||r.total)+' 道错题已自动重练完成，现在全部答对。': '精炼结果已记入学习记录；答错会在交卷后自动重练，未答的词可以回精炼页继续补完。')+'</div>'
       : (skippedItems.length ? '<div class="note">还有 '+skippedItems.length+' 题没作答，点“继续未答”可以直接接着做；未答的词不算答错，也不会进错题本。</div>' : '<div class="note">答错的词答完就即时收进错题本了，之后什么时候答对都会自动移出。</div>'));
 }
 
