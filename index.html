@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>单词大师 · 四级 / 六级</title>
 <meta name="application-name" content="单词大师">
-<meta name="app-version" content="2026.11.22.10">
+<meta name="app-version" content="2026.11.22.13">
 <meta name="app-build-date" content="2026-11-22">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23007AFF'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='19' font-weight='600' fill='%23FFFFFF' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
 <style>
@@ -2264,6 +2264,56 @@ body.dark .rf-fill-result{background:var(--card)}
   .rf-daily b{font-size:27px}
   .rf-maskline{font-size:26px}
 }
+/* 学习教练：文件收发 */
+.coach-form .coach-filebtn{
+  flex:0 0 40px;padding:0;display:grid;place-items:center;
+  border:1px solid var(--line-2);background:var(--card);color:var(--ink-2);
+  box-shadow:none;border-radius:10px;
+}
+.coach-form .coach-filebtn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.coach-filebtn svg{width:17px;height:17px;display:block}
+.coach-attachrow:empty{display:none}
+.coach-pending{display:flex;align-items:center;gap:9px;margin-top:9px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);min-width:0}
+.coach-pending .coach-fmeta{flex:1}
+.coach-pending .px{flex:0 0 auto;width:25px;height:25px;padding:0;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:13px;line-height:1}
+.coach-pending .px:hover{color:var(--wrong);border-color:var(--wrong)}
+.coach-file{display:flex;align-items:center;gap:9px;margin-top:7px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:var(--card);min-width:0}
+.coach-fico{
+  flex:0 0 35px;height:35px;border-radius:8px;display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent);font-size:9px;font-weight:750;letter-spacing:.03em;text-transform:uppercase;
+}
+.coach-fmeta{min-width:0;flex:1;line-height:1.3}
+.coach-fmeta b{display:block;font-size:11.5px;font-weight:650;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.coach-fmeta span{display:block;font-size:9.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bubble.user .coach-file{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28);color:#fff}
+.bubble.user .coach-fico{background:rgba(255,255,255,.20);color:#fff}
+.bubble.user .coach-fmeta b{color:#fff}
+.bubble.user .coach-fmeta span{color:rgba(255,255,255,.72)}
+.coach-dl{flex:0 0 auto;padding:5px 8px;border-radius:7px;border:1px solid var(--line);background:var(--accent-soft);color:var(--accent);font-size:10px;font-weight:650}
+.coach-dl:hover{border-color:var(--accent)}
+.coach-tools{display:flex;gap:10px;margin-top:7px}
+.coach-tool{padding:0;border:0;background:none;color:var(--muted);font-size:10px;text-decoration:underline;text-underline-offset:2px}
+.coach-tool:hover{color:var(--accent)}
+body.has-wall .coach-pending,body.has-wall .coach-file{background:rgba(0,0,0,.22);border-color:rgba(255,255,255,.30);color:#fff}
+body.has-wall .coach-pending .coach-fmeta b,body.has-wall .coach-file .coach-fmeta b{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+body.has-wall .coach-pending .coach-fmeta span,body.has-wall .coach-file .coach-fmeta span{color:rgba(255,255,255,.70)}
+body.has-wall .coach-form .coach-filebtn{background:rgba(0,0,0,.22);border-color:rgba(255,255,255,.30);color:#fff}
+body.has-wall .coach-tool{color:rgba(255,255,255,.70)}
+@media (max-width:360px){
+  .coach-form .coach-filebtn{flex-basis:36px}
+  .coach-fico{flex-basis:32px;height:32px;font-size:8px}
+}
+.paper-prompt{font-size:clamp(20px,4.8vw,26px);line-height:1.45;font-weight:650;color:var(--ink);letter-spacing:-.2px}
+.paper-prompt.long{font-size:clamp(16px,3.4vw,20px);line-height:1.55;font-weight:550;letter-spacing:0}
+.paper-rw{padding:11px 0;border-bottom:1px solid var(--line-2)}
+.paper-rw:last-child{border-bottom:0}
+.paper-rw .pq{font-size:12.5px;line-height:1.5;color:var(--ink);font-weight:600}
+.paper-rw .pa{margin-top:4px;font-size:11.5px;line-height:1.45;color:var(--right)}
+.paper-rw .py{margin-top:2px;font-size:11px;line-height:1.45;color:var(--wrong)}
+body.has-wall .paper-rw .pq{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+body.has-wall .paper-rw .pa,body.has-wall .paper-rw .py{text-shadow:0 1px 2px rgba(0,0,0,.8)}
+.coach-pending .coach-file{margin-top:0;padding:0;border:0;background:none;flex:1}
+body.has-wall .coach-pending .coach-file{background:none;border:0}
 </style>
 </head>
 <body>
@@ -19096,7 +19146,7 @@ const EXAMPLES = {"abandon":[["v.",[["He claimed that his parents had abandoned 
    ============================================================ */
 const N = WORDS.length;
 const LS_KEY = 'cet4vocab_20d_v1';
-const APP_VERSION = '2026.11.22.10';
+const APP_VERSION = '2026.11.22.13';
 const APP_VERSION_DATE = '2026-11-22';
 const UPDATE_DEFAULT_SRC = 'https://zhaowenhan371-blip.github.io/word-master/update.json';
 let updateFound = null;
@@ -19756,7 +19806,7 @@ let S = (state.session && state.session.qs && state.session.qs.length) ? state.s
 let wordBack = '#/home';
 if(S && S.mode==='day' && !S.book){ S.book='cet4'; save(); }
 // 旧版本遗留的混合题型会话直接作废，词记录与错题本保留
-if(S && S.mode!=='refine' && S.qs.some(function(q){ return q.t!=='en2cn'; })){ S=null; state.session=null; save(); }
+if(S && S.mode!=='refine' && S.mode!=='paper' && S.qs.some(function(q){ return q.t!=='en2cn'; })){ S=null; state.session=null; save(); }
 if(S && (S.mode==='custom' || S.mode==='book') && S.qs.some(function(q){ return !WORDS[q.i]; })){ S=null; state.session=null; save(); }
 // 兼容旧会话：把已存选项文本里的原词/音标/词性就地清掉（精炼的选单词/拼写题不做这一步）
 if(S){
@@ -20113,6 +20163,60 @@ function startQs(qs, mode, day, label, extra){
   save();
   go('#/quiz');
 }
+/* 导入题目：独立于单词库，按原题直接作答 */
+function paperFresh(q){
+  const opts = (q && Array.isArray(q.opts)) ? q.opts.map(function(o){ return {text:String(o.text||''),ok:!!o.ok}; }) : [];
+  const okIdx = opts.findIndex(function(o){ return o.ok; });
+  const fill = !!(q && q.t==='fill');
+  const ans = String((q && (q.correct || q.answer)) || '');
+  return {
+    t:fill ? 'fill' : 'mcq',
+    custom:true, i:-1,
+    prompt:String((q && q.prompt) || ''),
+    opts:opts,
+    correct:fill ? ans : (okIdx>=0 ? String(okIdx) : ans),
+    answer:ans,
+    chosen:-1, peek:null, prev:null, draft:'', answerText:''
+  };
+}
+function startPaper(qs, label){
+  const fresh = (qs||[]).map(paperFresh);
+  if(!fresh.length){ toast('这套题没有可作答的题目'); return; }
+  startQs(fresh, 'paper', -1, label || '导入题目');
+}
+function paperAnswerSummary(qs){
+  const letters = 'ABCD';
+  return (qs||[]).map(function(q, k){
+    let a = '';
+    if(q.t==='fill') a = String(q.correct || q.answer || '');
+    else {
+      const idx = (q.opts || []).findIndex(function(o){ return o.ok; });
+      a = idx>=0 ? letters.charAt(idx) : String(q.answer || q.correct || '');
+    }
+    return (k+1)+'. '+(a || '?');
+  }).join('  ');
+}
+function paperAutoAll(){
+  const p = state.coachPaper;
+  if(!p || !p.qs || !p.qs.length){ toast('先发一个题目文件'); return; }
+  const missing = p.qs.filter(function(q){ return !String(q.correct || q.answer || '').trim(); });
+  if(missing.length){ toast('这套题有 '+missing.length+' 题没有答案，先补上答案再代答'); return; }
+  const fresh = p.qs.map(paperFresh).map(function(q){
+    const n = Number(q.correct);
+    q.chosen = q.t==='fill' ? 0 : ((n>=0 && n<q.opts.length) ? n : -1);
+    q.answerText = q.t==='fill' ? q.correct : '';
+    q.prev = null;
+    return q;
+  });
+  if(fresh.some(function(q){ return q.chosen<0 || (q.t==='mcq' && !q.opts[q.chosen]); })){
+    toast('有题目的答案和选项对不上，先检查一下'); return;
+  }
+  S = { mode:'paper', key:'paper', label:p.label || '导入题目', qs:fresh, pos:0, ts:Date.now(), ver:'v4' };
+  state.session = S;
+  save();
+  finishPaper();
+  toast('已按文件里的答案全答');
+}
 
 /* ============================================================
    判定 / 结算
@@ -20142,6 +20246,13 @@ function answerOption(o){
   if(!S) return;
   const q = S.qs[S.pos];
   if(!q || q.chosen>=0) return;
+  if(q.custom){
+    q.chosen = o;
+    q.peek = null;
+    q.prev = null;
+    save(); render();
+    return;
+  }
   q.chosen = o;
   q.peek = null;
   const ok = !!(q.opts[o] && q.opts[o].ok);
@@ -20168,6 +20279,14 @@ function answerFill(raw){
   if(!q || q.chosen>=0) return;
   const txt = String(raw==null?'':raw).trim();
   if(!txt){ toast('先输入缺少的字母或完整单词'); return; }
+  if(q.custom){
+    q.answerText = txt;
+    q.chosen = coachNormText(txt) === coachNormText(q.correct) ? 0 : 1;
+    q.peek = null;
+    q.prev = null;
+    save(); render();
+    return;
+  }
   const ok = refineFillCorrect(q, txt);
   q.answerText = txt;
   q.chosen = ok ? 0 : 1;
@@ -20219,6 +20338,7 @@ function refineRetryClone(q){
 }
 function finish(){
   if(!S) return;
+  if(S.mode==='paper'){ finishPaper(); return; }
   const qs = S.qs;
   let right = 0, answered = 0;
   qs.forEach(function(q){
@@ -20269,6 +20389,32 @@ function finish(){
   save();
   go('#/result');
   if(unlocked) setTimeout(function(){ showTrophyAward(unlocked); }, 90);
+}
+function finishPaper(){
+  if(!S) return;
+  const qs = S.qs;
+  let right = 0, answered = 0;
+  qs.forEach(function(q){
+    if(q.chosen < 0) return;
+    answered++;
+    if(q.t==='fill' ? q.chosen===0 : !!(q.opts && q.opts[q.chosen] && q.opts[q.chosen].ok)) right++;
+  });
+  const label = S.label || '导入题目';
+  lastResult = {
+    mode:'paper', label:label, total:qs.length, right:right, answered:answered, ms:Date.now()-S.ts,
+    items:qs.map(function(q){
+      return {
+        q:q,
+        answered:q.chosen>=0,
+        ok:q.chosen>=0 && (q.t==='fill' ? q.chosen===0 : !!(q.opts && q.opts[q.chosen] && q.opts[q.chosen].ok))
+      };
+    })
+  };
+  state.session = null;
+  S = null;
+  sheetOpen = false;
+  save();
+  go('#/result');
 }
 
 /* ============================================================
@@ -21144,7 +21290,127 @@ let sheetOpen = false;
 let voiceSheetOpen = false;
 let exitSheetOpen = false;
 
+function viewPaperQuiz(){
+  if(!S) return viewHome();
+  const q = S.qs[S.pos];
+  if(!q) return viewHome();
+  const total = S.qs.length;
+  const answered = q.chosen >= 0;
+  const ok = answered && (q.t==='fill' ? q.chosen===0 : !!(q.opts[q.chosen] && q.opts[q.chosen].ok));
+  const left = S.qs.filter(function(x){ return x.chosen<0; }).length;
+  const pct = total ? Math.round(S.pos*100/total) : 0;
+  const correctText = q.t==='fill' ? q.correct : ((q.opts || []).find(function(o){ return o.ok; }) || {}).text || '';
+  let opts = '';
+  if(q.t !== 'fill'){
+    (q.opts || []).forEach(function(o, idx){
+      let cls = 'opt';
+      if(answered){
+        cls += ' locked';
+        if(o.ok) cls += ' right';
+        else if(q.chosen===idx) cls += ' wrong';
+        else cls += ' dim';
+      }
+      opts += '<button class="'+cls+'" data-act="answer" data-o="'+idx+'">'
+        + '<span class="key">'+String.fromCharCode(65+idx)+'</span>'
+        + '<span class="txt">'+esc(o.text)+'</span>'
+        + '</button>';
+    });
+  }
+  let fillPanel = '';
+  if(q.t === 'fill'){
+    fillPanel = '<div class="rf-fillbox">'
+      + (answered
+        ? '<div class="rf-fill-result '+(q.chosen===0?'ok':'no')+'">你写的是 <b>'+esc(q.answerText||'（空）')+'</b></div>'
+        : '<div class="rf-fill-form"><input id="fillInput" class="rf-fill-input" data-role="fill" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="输入答案" value="'+esc(q.draft||'')+'" autofocus><button class="primary" data-act="fillSubmit">提交</button></div>')
+      + '</div>';
+  }
+  let explain = '';
+  if(answered){
+    explain = '<div class="explain '+(ok?'ok':'no')+'">'
+      + '<div class="exp-h">'+(ok?'回答正确':'回答错误')+'</div>'
+      + '<div class="exp-cn"><span class="posbadge">正确答案</span>'+esc(correctText||'（未设置）')+'</div>'
+      + (ok ? '' : '<div class="exp-pick">你答的是：<s>'+esc(q.t==='fill'?(q.answerText||'（空）'):(q.opts[q.chosen]||{}).text||'（未答）')+'</s></div>')
+      + '</div>';
+  }
+  const cells = S.qs.map(function(x,k){
+    let cls = 'cell';
+    if(x.chosen>=0) cls += (x.t==='fill' ? (x.chosen===0?' ok':' no') : ((x.opts[x.chosen] && x.opts[x.chosen].ok)?' ok':' no'));
+    if(k===S.pos) cls += ' cur';
+    return '<button class="'+cls+'" data-act="jump" data-k="'+k+'">'+(k+1)+'</button>';
+  }).join('');
+  const sheet = sheetOpen ? '<div class="sheet"><div class="inner">'
+    + '<div class="sheet-h"><div class="t">答题卡</div><div class="s">已答 '+(total-left)+' / '+total+'　未答 '+left+'</div><button class="x" data-act="sheet">关闭</button></div>'
+    + '<div class="cells">'+cells+'</div>'
+    + '<div class="legend"><span><i class="ok"></i>答对</span><span><i class="no"></i>答错</span><span><i></i>未答</span></div>'
+    + '<div class="sheet-foot"><button class="ghost" data-act="finish">交卷并看结果</button></div>'
+    + '</div></div>' : '';
+  const nextLabel = (S.pos===total-1) ? (left>0?'跳到未答题':'交卷看结果') : '下一题';
+  const exitSheet = exitSheetOpen ? '<div class="sheet"><div class="inner">'
+    + '<div class="sheet-h"><div class="t">退出本轮？</div><div class="s">已答 '+(total-left)+' / '+total+'</div><button class="x" data-act="exitCancel">继续作答</button></div>'
+    + '<div class="note" style="margin:0 0 14px">进度会存在本机：题序、做到第几题、每题选了什么都会保留，下次从学习教练点「继续」就能接上。</div>'
+    + '<div class="sheet-foot" style="margin-top:0"><button class="primary" data-act="exitSave">退出并保存</button></div>'
+    + '<div class="sheet-foot"><button class="ghost danger" data-act="exitDrop">放弃本轮</button></div>'
+    + '</div></div>' : '';
+  return ''
+    + '<div class="topbar">'
+    +   '<button class="iconbtn" data-act="exitQuiz" title="退出">'+ICON.back+'</button>'
+    +   '<div class="topmid"><div class="t">'+esc(S.label||'导入题目')+'</div><div class="s">第 '+(S.pos+1)+' / '+total+' 题'+(left?' · 未答 '+left:'')+'</div></div>'
+    +   '<button class="iconbtn" data-act="sheet" title="答题卡">'+ICON.grid+'</button>'
+    +   '<div class="clock" id="clock">'+fmtTime(Date.now()-S.ts)+'</div>'
+    + '</div>'
+    + '<div class="progress"><i style="width:'+Math.max(pct,1)+'%"></i></div>'
+    + '<div class="qfoot qtop">'
+    +   '<button class="prevbtn" data-act="prev"'+(S.pos===0?' disabled':'')+'>上一题</button>'
+    +   '<button class="primary" data-act="next" '+(answered?'':'disabled')+'>'+nextLabel+'</button>'
+    + '</div>'
+    + '<div class="qcard">'
+    +   '<div class="qmeta"><span class="tag">'+(q.t==='fill'?'填空':'选择题')+'</span><span class="hint">导入题目 · 按原题作答</span></div>'
+    +   '<div class="prompt"><div class="paper-prompt'+(String(q.prompt||'').length>60?' long':'')+'">'+esc(q.prompt)+'</div></div>'
+    +   (q.t==='fill' ? fillPanel : '<div class="opts">'+opts+'</div>')
+    + '</div>'
+    + explain
+    + '<div class="kbd-hint">'+(q.t==='fill'?'输入后按 Enter 提交 · ← → 前后翻题':'按 1–4 选择 · ← → 前后翻题 · Enter 下一题')+'</div>'
+    + sheet + exitSheet;
+}
+function viewPaperResult(){
+  const r = lastResult;
+  if(!r) return viewHome();
+  const answered = r.answered || 0;
+  const pct = answered ? Math.round(r.right*100/answered) : 0;
+  const wrongItems = r.items.filter(function(x){ return x.answered && !x.ok; });
+  const skipped = r.items.filter(function(x){ return !x.answered; });
+  let wrongHtml = '';
+  if(!wrongItems.length) wrongHtml = '<div class="empty"><div class="big">全对，没有错题</div>这套题可以直接过</div>';
+  else wrongHtml = wrongItems.map(function(x){
+    const q = x.q || {};
+    const correct = q.t==='fill' ? q.correct : ((q.opts||[]).find(function(o){ return o.ok; })||{}).text;
+    const yours = q.t==='fill' ? (q.answerText||'（空）') : ((q.opts&&q.opts[q.chosen])||{}).text||'（未答）';
+    return '<div class="paper-rw"><div class="pq">'+esc(q.prompt||'')+'</div>'
+      + '<div class="pa">正确答案：'+esc(correct||'')+'</div>'
+      + '<div class="py">你答：'+esc(yours)+'</div></div>';
+  }).join('');
+  return ''
+    + '<div class="topbar">'
+    +   '<button class="iconbtn" data-act="nav" data-v="#/analysis" title="返回">'+ICON.back+'</button>'
+    +   '<div class="topmid"><div class="t">练习结果</div><div class="s">'+esc(r.label||'导入题目')+'</div></div>'
+    +   '<div class="clock">'+fmtTime(r.ms||0)+'</div>'
+    + '</div>'
+    + '<div class="hero">'
+    +   '<div class="pct">'+pct+'<small>%</small></div>'
+    +   '<div class="line">已答 '+answered+' / '+r.total+' 题 · '+(pct>=85?'稳，保持':(pct>=60?'及格，错题再看一遍':'偏低，建议重练错题'))+'</div>'
+    +   '<div class="split"><span class="ok">正确 <b>'+r.right+'</b></span><span class="no">错误 <b>'+wrongItems.length+'</b></span><span>未答 <b>'+skipped.length+'</b></span></div>'
+    + '</div>'
+    + '<div class="qfoot" style="margin-top:14px">'
+    +   (skipped.length ? '<button class="primary" data-act="paperRetrySkip">继续未答（'+skipped.length+'）</button>' : '')
+    +   (wrongItems.length ? '<button class="'+(skipped.length?'ghost':'primary')+'" data-act="paperRetryWrong">重练错题（'+wrongItems.length+'）</button>' : '')
+    +   '<button class="ghost" data-act="paperRestart">从头再做</button>'
+    + '</div>'
+    + '<div class="panel"><h3>错题回顾</h3>'+wrongHtml+'</div>'
+    + '<div class="note">这套题独立于单词计划，不会改动已学词和错题本；重练只重置本轮题目。</div>';
+}
+
 function viewQuiz(){
+  if(S && S.mode==='paper') return viewPaperQuiz();
   if(!S) return viewHome();
   const q = S.qs[S.pos];
   if(!q){ return viewHome(); }
@@ -21335,6 +21601,7 @@ function viewQuiz(){
    视图：结果
    ============================================================ */
 function viewResult(){
+  if(lastResult && lastResult.mode==='paper') return viewPaperResult();
   const r = lastResult;
   const book = r.book || planBookId();
   const isRefine = r.mode==='refine';
@@ -22038,7 +22305,8 @@ function coachWordAnswer(q){
   if(state.wrong[hit]) t += '\n这个词在错题本里，已错 '+(state.wrong[hit].n||1)+' 次。';
   return { t:t, a:[{act:'wordcard', i:hit, label:'打开单词卡'}] };
 }
-function coachReply(q){
+function coachReply(q, file){
+  if(file) return coachFileReply(file);
   const ql = q.toLowerCase();
   const st = coachCauseStats();
   const studied = studiedInBook(planBookId());
@@ -22169,10 +22437,11 @@ async function deepseekCall(q, opts){
   const history = (opts.history === false || !Array.isArray(state.coach)) ? [] : state.coach
     .filter(function(m){ return m && !m.tmp && (m.r==='u' || m.r==='a'); })
     .slice(-8)
-    .map(function(m){ return { role:(m.r==='u'?'user':'assistant'), content:String(m.t||'') }; });
+    .map(function(m){ return { role:(m.r==='u'?'user':'assistant'), content:coachHistoryContent(m) }; });
   if(!history.length || history[history.length-1].role !== 'user') history.push({role:'user', content:q});
   const system = '你是一名英语学习教练，服务对象是准备大学英语四级、六级的中文学生。'
     + '只根据给出的学习数据回答，不要编造不存在的答题记录。'
+    + '用户消息里可能包含“附件”文本：先把附件读明白再回答，不要编造附件里没有的内容；用户没提要求时，先概括附件并给下一步建议。'
     + '回答控制在 260 字以内，分点但不要用 Markdown 标记，语气直接、具体、可执行。'
     + '学习数据：\n'+deepseekContext(q);
   const ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
@@ -22205,7 +22474,535 @@ async function deepseekCall(q, opts){
     if(timer) clearTimeout(timer);
   }
 }
-function coachMsgHtml(m){
+let coachPendingFile = null;
+
+function coachFmtSize(n){
+  n = Number(n)||0;
+  if(n < 1024) return n+' B';
+  if(n < 1024*1024) return (n/1024).toFixed(n<10*1024?1:0)+' KB';
+  return (n/1024/1024).toFixed(1)+' MB';
+}
+function coachFileExt(name){
+  const m = String(name||'').toLowerCase().match(/\.([a-z0-9]{1,5})$/);
+  return m ? m[1] : 'FILE';
+}
+function coachStamp(){
+  const d = new Date();
+  const p = function(n){ return String(n).padStart(2,'0'); };
+  return String(d.getFullYear())+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes());
+}
+function coachFileChip(f, opts){
+  opts = opts || {};
+  if(!f) return '';
+  const ext = String(f.ext || coachFileExt(f.name)).toUpperCase().slice(0,4);
+  const bits = [];
+  if(f.size) bits.push(coachFmtSize(f.size));
+  const chars = Number(f.chars || (f.text ? String(f.text).length : 0));
+  if(chars) bits.push(chars+' 字');
+  if(f.truncated) bits.push('已截断');
+  const dl = (opts.idx!=null)
+    ? '<button class="coach-dl" data-act="coachSaveOut" data-i="'+opts.idx+'">下载</button>'
+    : '';
+  return '<div class="coach-file'+(opts.user?' on-accent':'')+'">'
+    + '<span class="coach-fico">'+esc(ext)+'</span>'
+    + '<div class="coach-fmeta"><b>'+esc(f.name||'附件')+'</b><span>'+esc(bits.join(' · ')||'文件')+'</span></div>'
+    + dl
+    + '</div>';
+}
+function coachHistoryContent(m){
+  let s = String((m && m.t) || '').trim();
+  if(m && m.f && m.f.text){
+    s += (s ? '\n\n' : '') + '【附件：'+String(m.f.name||'文件')+'】\n'+String(m.f.text).slice(0,6000);
+  }
+  return s;
+}
+function coachFileOut(text, prefix){
+  const body = String(text||'');
+  return {
+    name:(prefix||'教练回复')+'-'+coachStamp()+'.md',
+    mime:'text/markdown',
+    chars:body.length,
+    text:body
+  };
+}
+function coachReadText(file){
+  return new Promise(function(resolve, reject){
+    const r = new FileReader();
+    r.onerror = function(){ reject(new Error('文件读取失败')); };
+    r.onload = function(){ resolve(String(r.result||'')); };
+    r.readAsText(file, 'utf-8');
+  });
+}
+function coachReadBuffer(file){
+  if(file.arrayBuffer) return file.arrayBuffer();
+  return new Promise(function(resolve, reject){
+    const r = new FileReader();
+    r.onerror = function(){ reject(new Error('文件读取失败')); };
+    r.onload = function(){ resolve(r.result); };
+    r.readAsArrayBuffer(file);
+  });
+}
+async function coachUnzipEntry(buf, target){
+  const dv = new DataView(buf);
+  let eocd = -1;
+  const floor = Math.max(0, buf.byteLength - 65557);
+  for(let i=buf.byteLength-22; i>=floor; i--){
+    if(dv.getUint32(i,true) === 0x06054b50){ eocd = i; break; }
+  }
+  if(eocd < 0) throw new Error('不是有效的 docx 文件');
+  const count = dv.getUint16(eocd+10,true);
+  let cd = dv.getUint32(eocd+16,true);
+  let found = null;
+  for(let k=0;k<count;k++){
+    if(cd+46 > buf.byteLength || dv.getUint32(cd,true) !== 0x02014b50) break;
+    const method = dv.getUint16(cd+10,true);
+    const csize = dv.getUint32(cd+20,true);
+    const usize = dv.getUint32(cd+24,true);
+    const nlen = dv.getUint16(cd+28,true);
+    const xlen = dv.getUint16(cd+30,true);
+    const clen = dv.getUint16(cd+32,true);
+    const lho = dv.getUint32(cd+42,true);
+    const name = new TextDecoder('utf-8').decode(new Uint8Array(buf, cd+46, nlen));
+    if(name === target){ found = {method:method,csize:csize,usize:usize,lho:lho}; break; }
+    cd += 46+nlen+xlen+clen;
+  }
+  if(!found) throw new Error('docx 里没有可读正文');
+  const nlen = dv.getUint16(found.lho+26,true);
+  const xlen = dv.getUint16(found.lho+28,true);
+  const start = found.lho+30+nlen+xlen;
+  const bytes = new Uint8Array(buf, start, found.csize);
+  if(found.method === 0) return new TextDecoder('utf-8').decode(bytes);
+  if(found.method !== 8) throw new Error('docx 压缩格式暂不支持');
+  if(typeof DecompressionStream === 'undefined') throw new Error('当前浏览器不支持读取 docx，请另存为 txt');
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return await new Response(stream).text();
+}
+async function coachExtractDocx(file){
+  const xml = await coachUnzipEntry(await coachReadBuffer(file), 'word/document.xml');
+  if(typeof DOMParser === 'undefined') throw new Error('当前浏览器不支持解析 docx');
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  if(!doc || doc.getElementsByTagName('parsererror').length) throw new Error('docx 正文解析失败');
+  const ns = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+  const paragraphs = doc.getElementsByTagNameNS(ns, 'p');
+  const lines = [];
+  for(let i=0;i<paragraphs.length;i++){
+    const t = String(paragraphs[i].textContent||'').trim();
+    if(t) lines.push(t);
+  }
+  return lines.join('\n');
+}
+let coachPdfJsPromise = null;
+function coachScript(src){
+  return new Promise(function(resolve, reject){
+    const s = document.createElement('script');
+    s.src = src; s.async = true;
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ s.remove(); reject(new Error('脚本加载失败')); };
+    document.head.appendChild(s);
+  });
+}
+function coachPdfLib(){
+  if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if(coachPdfJsPromise) return coachPdfJsPromise;
+  coachPdfJsPromise = (async function(){
+    const urls = [
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
+      'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js'
+    ];
+    for(let i=0;i<urls.length;i++){
+      try{ await coachScript(urls[i]); if(window.pdfjsLib) break; }catch(e){}
+    }
+    if(!window.pdfjsLib) throw new Error('PDF 解析组件没加载出来，请联网后重试');
+    try{
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    }catch(e){}
+    return window.pdfjsLib;
+  })();
+  return coachPdfJsPromise;
+}
+async function coachExtractPdf(file){
+  const pdfjs = await coachPdfLib();
+  const data = new Uint8Array(await coachReadBuffer(file));
+  const doc = await pdfjs.getDocument({
+    data:data,
+    cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+    cMapPacked:true,
+    standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/',
+    isEvalSupported:false
+  }).promise;
+  const lines = [];
+  const pages = Math.min(doc.numPages || 0, 120);
+  for(let i=1;i<=pages;i++){
+    const page = await doc.getPage(i);
+    const tc = await page.getTextContent();
+    let line = '';
+    (tc.items || []).forEach(function(it){
+      line += String(it.str || '');
+      if(it.hasEOL){
+        if(line.trim()) lines.push(line.trim());
+        line = '';
+      }
+    });
+    if(line.trim()) lines.push(line.trim());
+    if(lines.join('\n').length > 30000) break;
+  }
+  try{ doc.destroy(); }catch(e){}
+  const text = lines.join('\n').trim();
+  if(!text) throw new Error('PDF 里没有可提取的文字，可能是扫描版；请先 OCR 成可复制文本');
+  return text;
+}
+async function coachHandleFile(file){
+  if(!file) return;
+  const ext = coachFileExt(file.name);
+  if(!/^(txt|md|csv|json|html|htm|docx|pdf)$/.test(ext)){
+    toast('支持 txt / md / csv / json / docx / pdf');
+    return;
+  }
+  const max = (ext==='docx' || ext==='pdf') ? 10*1024*1024 : 2*1024*1024;
+  if((file.size||0) > max){ toast('文件太大，请控制在 '+((ext==='docx'||ext==='pdf')?'10MB':'2MB')+' 以内'); return; }
+  try{
+    let text = '';
+    if(ext==='docx') text = await coachExtractDocx(file);
+    else if(ext==='pdf') text = await coachExtractPdf(file);
+    else text = await coachReadText(file);
+    text = String(text||'').replace(/\r\n/g,'\n').trim();
+    if(!text){ toast('文件里没有可读文字'); return; }
+    const limit = 20000;
+    const truncated = text.length > limit;
+    coachPendingFile = {
+      name:file.name || ('附件.'+ext),
+      size:file.size || 0,
+      ext:ext,
+      chars:text.length,
+      text:text.slice(0,limit),
+      truncated:truncated
+    };
+    render();
+    toast(truncated ? '已添加，文件较长，超出部分不会发送' : '已添加 '+coachPendingFile.name);
+  }catch(err){
+    toast('读取失败：'+String((err && err.message) || '文件格式不支持').slice(0,80));
+  }
+}
+function coachWordMap(){
+  const map = {};
+  for(let i=0;i<N;i++){
+    const w = WORDS[i];
+    if(w) map[String(w[0]).toLowerCase()] = { book:'四级', cn:cleanDef(w[3],w[0]) };
+  }
+  CET6_IDS.forEach(function(uid){
+    const m = CET6_WORDS[uid] || CUSTOM_WORDS[uid];
+    if(!m) return;
+    const k = String(m.word||'').toLowerCase();
+    if(k) map[k] = { book:m.bookName || (CUSTOM_WORDS[uid] ? '自定义' : '六级'), cn:m.meaning || '' };
+  });
+  Object.keys(CUSTOM_WORDS).forEach(function(k){
+    const m = CUSTOM_WORDS[k];
+    if(m && m.word) map[String(m.word).toLowerCase()] = { book:m.bookName || '自定义', cn:m.meaning || '' };
+  });
+  return map;
+}
+function coachCsvCell(v){
+  return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+}
+function coachNormText(v){
+  return String(v==null?'':v).toLowerCase().replace(/[\s，。；：、,.;:!?！？"'“”‘’（）()\-]/g,'');
+}
+function coachCsvRows(text){
+  const rows = [];
+  let row = [], cell = '', quoted = false;
+  const s = String(text||'');
+  for(let i=0;i<s.length;i++){
+    const ch = s[i];
+    if(ch === '"'){
+      if(quoted && s[i+1] === '"'){ cell += '"'; i++; }
+      else quoted = !quoted;
+    } else if(ch === ',' && !quoted){
+      row.push(cell); cell = '';
+    } else if((ch === '\n' || ch === '\r') && !quoted){
+      if(ch === '\r' && s[i+1] === '\n') i++;
+      row.push(cell); cell = '';
+      if(row.some(function(x){ return String(x).trim(); })) rows.push(row);
+      row = [];
+    } else {
+      cell += ch;
+    }
+  }
+  row.push(cell);
+  if(row.some(function(x){ return String(x).trim(); })) rows.push(row);
+  return rows;
+}
+function coachPaperQ(prompt, options, answer){
+  const p = String(prompt||'').trim();
+  if(!p) return null;
+  const opts = (options||[]).map(function(o){ return String(o==null?'':o).trim(); }).filter(Boolean);
+  if(opts.length >= 2){
+    let idx = -1;
+    const key = String(answer==null?'':answer).trim();
+    if(/^[A-Za-z]$/.test(key)) idx = key.toUpperCase().charCodeAt(0)-65;
+    else if(/^\d+$/.test(key)){
+      const n = parseInt(key,10);
+      idx = (n > 0 && n <= opts.length) ? n-1 : n;
+    } else {
+      const nk = coachNormText(key);
+      idx = opts.findIndex(function(o){ return coachNormText(o) === nk; });
+      if(idx < 0 && nk) idx = opts.findIndex(function(o){ return coachNormText(o).indexOf(nk) >= 0; });
+    }
+    if(idx < 0 || idx >= opts.length) return null;
+    return {
+      t:'mcq', custom:true, i:-1, prompt:p,
+      opts:opts.map(function(o,k){ return { text:o, ok:k===idx }; }),
+      answer:opts[idx], chosen:-1, peek:null, prev:null, draft:'', answerText:''
+    };
+  }
+  const ans = String(answer==null?'':answer).trim();
+  if(!ans) return null;
+  return {
+    t:'fill', custom:true, i:-1, prompt:p, correct:ans, answer:ans,
+    opts:[{text:ans,ok:true}], chosen:-1, peek:null, prev:null, draft:'', answerText:''
+  };
+}
+function coachParseQuestionJson(f){
+  let obj = null;
+  try{ obj = JSON.parse(String(f.text||'')); }catch(err){ return null; }
+  const arr = Array.isArray(obj) ? obj : (obj && (obj.questions || obj.items || obj.qs || obj.list));
+  if(!Array.isArray(arr)) return null;
+  const qs = [];
+  for(let k=0;k<arr.length && qs.length<200;k++){
+    const it = arr[k] || {};
+    const prompt = it.q || it.question || it.stem || it.prompt || it.title || it['题干'];
+    let opts = it.options || it.opts || it.choices || it['选项'] || [];
+    if(!Array.isArray(opts) && opts && typeof opts==='object'){
+      opts = Object.keys(opts).sort().map(function(key){ return opts[key]; });
+    }
+    const ans = it.answer != null ? it.answer : (it.correct != null ? it.correct : (it.key != null ? it.key : it['答案']));
+    const q = coachPaperQ(prompt, opts, ans);
+    if(q) qs.push(q);
+  }
+  if(!qs.length) return null;
+  return { label:String(f.name||'导入题目').replace(/\.(txt|md|csv|json|docx)$/i,''), qs:qs.slice(0,200) };
+}
+function coachParseQuestionCsv(f){
+  const rows = coachCsvRows(f.text);
+  if(rows.length < 2) return null;
+  const header = rows[0].map(function(s){ return String(s).trim().toLowerCase(); });
+  const hasHeader = header.some(function(s){ return /^(题目|题干|问题|question|stem)$/.test(s); });
+  let qi = 0, ai = -1, optIdx = [];
+  if(hasHeader){
+    qi = header.findIndex(function(s){ return /^(题目|题干|问题|question|stem)$/.test(s); });
+    ai = header.findIndex(function(s){ return /^(答案|正确答案|answer|correct|key)$/.test(s); });
+    header.forEach(function(h,k){
+      if(/^(选项|option|choice)[a-d]?$/.test(h) || /^(a|b|c|d)$/.test(h)) optIdx.push(k);
+    });
+  } else if(rows[0].length >= 6){
+    qi = 0; optIdx = [1,2,3,4]; ai = 5;
+  } else if(rows[0].length >= 5){
+    qi = 0; optIdx = [1,2,3]; ai = 4;
+  } else return null;
+  if(qi < 0 || ai < 0 || optIdx.length < 2) return null;
+  const qs = [];
+  for(let r=1;r<rows.length && qs.length<200;r++){
+    const row = rows[r];
+    if(!row || row.length <= ai) continue;
+    const q = coachPaperQ(row[qi], optIdx.map(function(k){ return row[k]; }), row[ai]);
+    if(q) qs.push(q);
+  }
+  if(!qs.length) return null;
+  return { label:String(f.name||'导入题目').replace(/\.(txt|md|csv|json|docx)$/i,''), qs:qs };
+}
+function coachParseQuestionTxt(f){
+  const text = String(f.text||'').replace(/\r\n/g,'\n');
+  const lines = text.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  if(lines.length < 2) return null;
+  const blocks = [];
+  let cur = [];
+  lines.forEach(function(line){
+    if(/^(?:\d+[\.、)]|第\s*\d+\s*题|【\s*\d+\s*】)/.test(line) && cur.length){
+      blocks.push(cur); cur = [];
+    }
+    cur.push(line);
+  });
+  if(cur.length) blocks.push(cur);
+  const qs = [];
+  blocks.forEach(function(block){
+    const flat = [];
+    block.forEach(function(line){
+      line.replace(/\s+([A-Da-d])[\.、)]\s*/g, '\n$1. ').split('\n').forEach(function(x){
+        if(String(x).trim()) flat.push(String(x).trim());
+      });
+    });
+    let prompt = '', answer = '';
+    const options = [];
+    flat.forEach(function(line, k){
+      const om = line.match(/^([A-Da-d])[\.、)]\s*(.+)$/);
+      if(om){ options[om[1].toUpperCase().charCodeAt(0)-65] = om[2].trim(); return; }
+      const am = line.match(/^(?:答案|正确答案|answer|correct)\s*[：:]\s*(.+)$/i);
+      if(am){ answer = am[1].trim(); return; }
+      if(!prompt && !/^(?:答案|正确答案)\s*[：:]/.test(line)){
+        prompt = line.replace(/^(?:\d+[\.、)]|第\s*\d+\s*题|【\s*\d+\s*】)\s*/,'').trim();
+      }
+    });
+    if(prompt && answer && options.filter(Boolean).length >= 2){
+      const q = coachPaperQ(prompt, options, answer);
+      if(q) qs.push(q);
+    }
+  });
+  if(!qs.length) return null;
+  return { label:String(f.name||'导入题目').replace(/\.(txt|md|csv|json|docx)$/i,''), qs:qs.slice(0,200) };
+}
+function coachParsePaper(f){
+  if(!f) return null;
+  const ext = String(f.ext||'').toLowerCase();
+  if(ext === 'json') return coachParseQuestionJson(f);
+  if(ext === 'csv') return coachParseQuestionCsv(f) || coachParseQuestionJson(f);
+  return coachParseQuestionTxt(f);
+}
+function coachPaperCsv(qs){
+  const rows = [['题目','选项A','选项B','选项C','选项D','答案'].map(coachCsvCell).join(',')];
+  (qs||[]).forEach(function(q){
+    const opts = (q.opts||[]).map(function(o){ return o.text; });
+    const ans = q.t==='fill' ? q.correct : (q.opts && q.opts.find(function(o){ return o.ok; }) || {}).text;
+    rows.push([q.prompt||'', opts[0]||'', opts[1]||'', opts[2]||'', opts[3]||'', ans||''].map(coachCsvCell).join(','));
+  });
+  return rows.join('\n');
+}
+function coachFileReply(f){
+  const text = String(f.text||'');
+  const paper = coachParsePaper(f);
+  if(paper && paper.qs.length){
+    state.coachPaper = { label:paper.label || '导入题目', qs:paper.qs, createdAt:Date.now() };
+    const csv = coachPaperCsv(paper.qs);
+    const out = {
+      name:'整理后的题目-'+coachStamp()+'.csv',
+      mime:'text/csv',
+      chars:csv.length,
+      text:csv
+    };
+    const sample = paper.qs.slice(0,2).map(function(q){ return q.prompt; }).join(' / ');
+    return {
+      t:'识别到 '+paper.qs.length+' 道题：'+(sample||'')+(paper.qs.length>2?' …':'')+'\n'
+        + '已整理成可直接作答的练习。点「打开这套题」开始；也可以下载整理后的 CSV。',
+      out:out,
+      a:[{act:'coachPlayPaper', label:'打开这套题（'+paper.qs.length+' 题）'},{act:'paperAuto', label:'帮我全答（'+paper.qs.length+' 题）'}]
+    };
+  }
+  const lines = text.split(/\n/).map(function(s){ return s.trim(); }).filter(Boolean);
+  const tokens = (text.match(/[A-Za-z][A-Za-z'\-]{1,}/g) || []).map(function(w){ return w.toLowerCase(); });
+  const unique = Array.from(new Set(tokens));
+  const wordMap = coachWordMap();
+  const listLike = lines.length >= 3 && tokens.length <= lines.length * 5;
+  if(listLike && unique.length){
+    const known = [], unknown = [];
+    unique.forEach(function(w){ (wordMap[w] ? known : unknown).push(w); });
+    const csv = [['单词','是否在词库','词书','释义'].map(coachCsvCell).join(',')];
+    unique.forEach(function(w){
+      const m = wordMap[w];
+      csv.push([w, m?'是':'否', m?m.book:'', m?m.cn:''].map(coachCsvCell).join(','));
+    });
+    const out = {
+      name:'词表分析-'+coachStamp()+'.csv',
+      mime:'text/csv',
+      chars:csv.join('\n').length,
+      text:csv.join('\n')
+    };
+    const sample = unknown.slice(0,10);
+    let t = '读取《'+f.name+'》：'+lines.length+' 行，'+unique.length+' 个不同英文词。\n'
+      + '词库已收录 '+known.length+' 个，未收录 '+unknown.length+' 个。';
+    if(sample.length) t += '\n未收录示例：'+sample.join('、')+(unknown.length>sample.length?' 等':'')+'。';
+    t += '\n已生成《词表分析.csv》，点文件下载；也可以直接问我下一步怎么安排。';
+    return {t:t, out:out, a:[]};
+  }
+  const head = lines.slice(0,6).join('\n');
+  const body = '# 文件摘要\n\n文件：'+f.name+'\n字符数：'+text.length+'\n\n## 前几行\n\n'+head
+    + '\n\n## 原文\n\n'+text.slice(0,12000);
+  return {
+    t:'读取《'+f.name+'》：'+text.length+' 字。离线模式先提取了文件内容和前几行，已生成摘要文件。\n接 DeepSeek 后可以直接做语义总结、出题或改写。',
+    out:{name:'文件摘要-'+coachStamp()+'.md',mime:'text/markdown',chars:body.length,text:body},
+    a:[]
+  };
+}
+function coachReportText(){
+  const studied = studiedInBook(planBookId());
+  const total = planIds().length;
+  const acc = accuracyAll();
+  const st = coachCauseStats();
+  const top = coachTopWrong(10);
+  const clusters = (AI.cl || []).slice(0,6);
+  let t = '# 单词大师 · 学习报告\n\n';
+  t += '- 生成时间：'+todayStr()+'\n';
+  t += '- 当前计划：'+planBookLabel()+'，已学 '+studied+'/'+total+'，正确率 '+acc+'%\n';
+  t += '- 错题：'+st.list.length+' 个（近义/形近干扰 '+st.near+'，记忆偏差 '+st.far+'，无选错记录 '+st.unknown+'）\n\n';
+  t += '## 高危错词\n\n';
+  if(top.length){
+    top.forEach(function(i){
+      const w = WORDS[i];
+      const n = state.wrong[i].n || 1;
+      if(!w){ t += '- #'+i+'（错 '+n+' 次）\n'; return; }
+      const d = wrongDiagData(i, state.wrong[i] && state.wrong[i].pick);
+      t += '- '+w[0]+'（'+cnOf(i)+'，错 '+n+' 次';
+      if(d && d.pickWord) t += '，误选 '+d.pickWord;
+      t += '）\n';
+    });
+  } else {
+    t += '暂无错题，先把每日计划跑起来。\n';
+  }
+  t += '\n## 易混词簇\n\n';
+  if(clusters.length){
+    clusters.forEach(function(c){
+      const names = c.map(function(i){ return WORDS[i] ? WORDS[i][0] : null; }).filter(Boolean);
+      if(names.length) t += '- '+names.join(' / ')+'\n';
+    });
+  } else t += '暂无易混簇数据。\n';
+  t += '\n## 下一步\n\n';
+  if(st.list.length) t += '1. 先重练高危错词，重点看形近/近义干扰。\n2. 再开一组易混辨析，把选错项和正确项放在一起记。\n3. 最后回到每日计划，保持新词和滚动复习。\n';
+  else t += '1. 按当前每日计划继续学新词。\n2. 每学完一组，隔天做滚动复习。\n3. 有错题后回来导出一次诊断报告。\n';
+  return t;
+}
+function coachExportReport(){
+  if(!Array.isArray(state.coach)) state.coach = [];
+  const text = coachReportText();
+  state.coach.push({r:'u', t:'导出学习报告'});
+  state.coach.push({
+    r:'a',
+    t:'学习报告已生成。点下面的文件下载，或者复制内容保存。',
+    out:{name:'学习报告-'+todayStr()+'.md',mime:'text/markdown',chars:text.length,text:text}
+  });
+  if(state.coach.length > 30) state.coach = state.coach.slice(-30);
+  save(); render(); coachScroll();
+}
+async function coachSaveBlob(name, text, mime){
+  text = String(text||'');
+  if(!text){ toast('没有可保存的内容'); return; }
+  name = String(name||'教练回复.md').replace(/[\\/:*?"<>|]/g,'-');
+  const blob = new Blob([text], {type:(mime||'text/plain')+';charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.style.display = 'none';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+  toast('开始下载 '+name);
+}
+function coachCopyText(text){
+  text = String(text||'');
+  if(!text){ toast('没有可复制的内容'); return; }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ toast('已复制'); }).catch(function(){ coachFallbackCopy(text); });
+    return;
+  }
+  coachFallbackCopy(text);
+}
+function coachFallbackCopy(text){
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand && document.execCommand('copy');
+    ta.remove();
+    toast(ok ? '已复制' : '复制失败，请手动选择');
+  }catch(err){ toast('复制失败'); }
+}
+
+function coachMsgHtml(m, idx){
   const role = (m && m.r==='u') ? 'user' : 'agent';
   const text = esc((m && m.t) || '').replace(/\n/g,'<br>');
   const acts = (m && Array.isArray(m.a) && m.a.length) ? '<div class="coach-actions">'+m.a.map(function(a){
@@ -22214,28 +23011,42 @@ function coachMsgHtml(m){
     if(a.i!=null) attrs += ' data-i="'+a.i+'"';
     return '<button class="coach-action" '+attrs+'>'+esc(a.label||'')+'</button>';
   }).join('')+'</div>' : '';
-  return '<div class="bubble '+role+'">'+text+acts+'</div>';
+  const inFile = (role==='user' && m && m.f) ? coachFileChip(m.f,{user:true}) : '';
+  const outFile = (role==='agent' && m && m.out) ? coachFileChip(m.out,{idx:idx}) : '';
+  const tools = (role==='agent' && m && !m.tmp) ? '<div class="coach-tools">'
+    + '<button class="coach-tool" data-act="coachSave" data-i="'+idx+'">存为文件</button>'
+    + '<button class="coach-tool" data-act="coachCopy" data-i="'+idx+'">复制</button>'
+    + '</div>' : '';
+  return '<div class="bubble '+role+'">'+text+inFile+outFile+acts+tools+'</div>';
 }
 function coachHtml(){
   const log = Array.isArray(state.coach) ? state.coach : [];
   const intro = log.length ? '' : (deepseekReady()
-    ? '<div class="bubble agent">我是学习教练，已接入 DeepSeek。可以问我：今天练什么、诊断我的错题、我最薄弱的词，或直接输入一个英文词。\n提问时会把相关学习数据发送给 DeepSeek，其他时间不联网。</div>'
-    : '<div class="bubble agent">我是学习教练，只看这台设备上的答题记录，不联网。\n可以问我：今天练什么、诊断我的错题、我最薄弱的词，或直接输入一个英文词。</div>');
+    ? '<div class="bubble agent">我是学习教练，已接入 DeepSeek。可以问我：今天练什么、诊断我的错题、我最薄弱的词，或直接输入一个英文词。\n也可以发 txt / md / csv / json / docx / pdf，我会读取并回答；发文件时文件文字会随问题发送给 DeepSeek。</div>'
+    : '<div class="bubble agent">我是学习教练，只看这台设备上的答题记录，不联网。\n可以问我：今天练什么、诊断我的错题、我最薄弱的词，或直接输入一个英文词。\n也可以发 txt / md / csv / json / docx / pdf，文件只在本地读取。</div>');
+  const pending = coachPendingFile
+    ? '<div class="coach-pending">'+coachFileChip(coachPendingFile)+'<button class="px" data-act="coachUnattach" aria-label="移除文件">×</button></div>'
+    : '';
   return '<div class="coach">'
     + '<div class="coach-head"><div class="coach-avatar">AI</div>'
-    +   '<div class="ct"><b>学习教练</b><span>'+(deepseekReady()?'DeepSeek 已接入 · 云模型，按问题发送学习数据':'离线规则智能体 · 可在设置接入 DeepSeek')+'</span></div>'
+    +   '<div class="ct"><b>学习教练</b><span>'+(deepseekReady()?'DeepSeek 在线 · 对话 + 文件':'离线规则智能体 · 支持文本文件')+'</span></div>'
     +   '<button class="coach-cfg" data-act="nav" data-v="#/settings">设置</button>'
     +   '<button class="coach-clear" data-act="coachClear">清空</button>'
     + '</div>'
-    + '<div class="coach-log" id="coachlog">'+intro+log.map(coachMsgHtml).join('')+'</div>'
+    + '<div class="coach-log" id="coachlog">'+intro+log.map(function(m,idx){ return coachMsgHtml(m,idx); }).join('')+'</div>'
     + '<div class="coach-quick">'
     +   '<button data-act="coachQuick" data-q="今天练什么">今天练什么</button>'
     +   '<button data-act="coachQuick" data-q="诊断我的错题">诊断错题</button>'
     +   '<button data-act="coachQuick" data-q="我最薄弱的词">薄弱词</button>'
     +   '<button data-act="coachQuick" data-q="给我一组辨析练习">易混辨析</button>'
+    +   '<button data-act="coachExport">导出报告</button>'
+    +   (state.coachPaper && state.coachPaper.qs && state.coachPaper.qs.length ? '<button data-act="paperAuto">帮我全答（'+state.coachPaper.qs.length+' 题）</button>' : '')
     + '</div>'
+    + '<div class="coach-attachrow">'+pending+'</div>'
     + '<div class="coach-form">'
-    +   '<input id="coachq" data-role="coachq" placeholder="问教练：今天练什么？" autocomplete="off">'
+    +   '<input type="file" id="coachFile" accept=".txt,.md,.csv,.json,.docx,.pdf,text/plain,text/markdown,text/csv,application/json,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>'
+    +   '<button class="coach-filebtn" data-act="coachPickFile" title="发送文件" aria-label="发送文件"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M21.4 11.6l-8.5 8.5a5 5 0 0 1-7.1-7.1l8.7-8.7a3.4 3.4 0 0 1 4.8 4.8l-8.7 8.7a1.8 1.8 0 0 1-2.5-2.5l8-8"/></svg></button>'
+    +   '<input id="coachq" data-role="coachq" placeholder="'+(coachPendingFile?'给文件加一句要求，或直接发送':'问教练：今天练什么？')+'" autocomplete="off">'
     +   '<button data-act="coachSend">发送</button>'
     + '</div>'
     + '</div>';
@@ -22248,19 +23059,57 @@ function coachScroll(){
     if(log) log.scrollTop = log.scrollHeight;
   }, 0);
 }
-function coachAsk(raw){
+function coachAsk(raw, fileArg){
   const q = String(raw || '').trim();
-  if(!q) return;
+  const f = fileArg || coachPendingFile;
+  if(!q && !f) return;
   if(coachBusy){ toast('DeepSeek 还在回答，稍等一下'); return; }
   if(!Array.isArray(state.coach)) state.coach = [];
-  state.coach.push({r:'u', t:q});
+  const file = f ? {
+    name:f.name,
+    size:f.size,
+    ext:f.ext,
+    chars:f.chars,
+    text:f.text,
+    truncated:!!f.truncated
+  } : null;
+  state.coach.push({r:'u', t:q, f:file});
+  coachPendingFile = null;
   if(!deepseekReady()){
-    state.coach.push(Object.assign({r:'a'}, coachReply(q)));
+    state.coach.push(Object.assign({r:'a'}, file ? coachFileReply(file) : coachReply(q)));
     if(state.coach.length > 30) state.coach = state.coach.slice(-30);
     save(); render(); coachScroll();
     return;
   }
-  const local = coachReply(q);
+  const local = file ? coachFileReply(file) : coachReply(q);
+  const paperAsk = !file && state.coachPaper && !/别|不要|不用/.test(q) && /(全答|全做|全部答|全部做|帮我答|代答|都答|答完|做完)/.test(q);
+  if(paperAsk){
+    const p = state.coachPaper;
+    const qs = p && Array.isArray(p.qs) ? p.qs : [];
+    const missing = qs.filter(function(x){ return !String(x.correct || x.answer || '').trim(); });
+    if(qs.length && !missing.length){
+      const ans = paperAnswerSummary(qs);
+      state.coach.push({
+        r:'a',
+        t:'这套题 '+qs.length+' 题，我按文件里的答案直接全答了：'+ans+'\n'
+          + '结果页会显示参考分；想自己练就点「打开这套题」，不要点「帮我全答」。',
+        a:[{act:'coachPlayPaper', label:'打开这套题（'+qs.length+' 题）'}]
+      });
+      if(state.coach.length > 30) state.coach = state.coach.slice(-30);
+      save(); render(); coachScroll();
+      return;
+    }
+    if(qs.length){
+      state.coach.push({
+        r:'a',
+        t:'这套题里有 '+missing.length+' 题没有答案，我没法代答。把答案补进文件后再发给我，或者点「打开这套题」自己做。',
+        a:[{act:'coachPlayPaper', label:'打开这套题（'+qs.length+' 题）'}]
+      });
+      if(state.coach.length > 30) state.coach = state.coach.slice(-30);
+      save(); render(); coachScroll();
+      return;
+    }
+  }
   const seq = ++coachReqSeq;
   coachBusy = true;
   state.coach.push({r:'a', t:'DeepSeek 正在思考…', tmp:true});
@@ -22269,7 +23118,11 @@ function coachAsk(raw){
     if(seq !== coachReqSeq) return;
     coachBusy = false;
     state.coach = state.coach.filter(function(m){ return !m.tmp; });
-    state.coach.push({r:'a', t:txt});
+    state.coach.push({
+      r:'a', t:txt,
+      a:(file && local && local.a) ? local.a : [],
+      out:file ? (local.out || coachFileOut(txt, '文件回复')) : null
+    });
     if(state.coach.length > 30) state.coach = state.coach.slice(-30);
     save(); render(); coachScroll();
   }).catch(function(err){
@@ -22277,7 +23130,9 @@ function coachAsk(raw){
     coachBusy = false;
     state.coach = state.coach.filter(function(m){ return !m.tmp; });
     const msg = String((err && err.message) || '请求失败').slice(0,120);
-    state.coach.push({r:'a', t:'DeepSeek 调用失败：'+msg+'\n先给你离线诊断：\n'+local.t, a:local.a});
+    const fallback = Object.assign({r:'a', t:'DeepSeek 调用失败：'+msg+'\n先给你本地结果：\n'+local.t}, local.out ? {out:local.out} : {});
+    if(local.a) fallback.a = local.a;
+    state.coach.push(fallback);
     if(state.coach.length > 30) state.coach = state.coach.slice(-30);
     save(); render(); coachScroll();
   });
@@ -22342,7 +23197,7 @@ function viewAnalysis(){
   return ''
   + '<div class="topbar">'
   +   '<button class="iconbtn" data-act="home">'+ICON.back+'</button>'
-  +   '<div class="topmid"><div class="t">AI 学习教练</div><div class="s">'+(deepseekReady()?'DeepSeek 在线 · 对话式诊断':'本地语义分析 · 对话式诊断')+'</div></div>'
+  +   '<div class="topmid"><div class="t">AI 学习教练</div><div class="s">'+(deepseekReady()?'DeepSeek 在线 · 对话 + 文件':'本地语义分析 · 支持文本文件')+'</div></div>'
   + '</div>'
   + coach
   + '<div class="stats" style="margin-top:0">'
@@ -23067,9 +23922,45 @@ document.addEventListener('click', function(e){
     return;
   }
   if(act==='coachQuick'){ coachAsk(el.getAttribute('data-q') || ''); return; }
+  if(act==='coachPickFile'){
+    const f = document.getElementById('coachFile');
+    if(f){ f.value=''; f.click(); }
+    return;
+  }
+  if(act==='coachUnattach'){ coachPendingFile = null; render(); return; }
+  if(act==='coachSave' || act==='coachSaveOut'){
+    const i = parseInt(el.getAttribute('data-i'),10);
+    const m = Array.isArray(state.coach) ? state.coach[i] : null;
+    if(!m){ toast('这条记录已经不在了'); return; }
+    const out = m.out || {name:'教练回复-'+coachStamp()+'.md',mime:'text/markdown',text:String(m.t||'')};
+    coachSaveBlob(out.name, out.text, out.mime);
+    return;
+  }
+  if(act==='coachCopy'){
+    const i = parseInt(el.getAttribute('data-i'),10);
+    const m = Array.isArray(state.coach) ? state.coach[i] : null;
+    if(!m){ toast('这条记录已经不在了'); return; }
+    coachCopyText((m.out && m.out.text) || m.t || '');
+    return;
+  }
+  if(act==='coachExport'){ coachExportReport(); return; }
+  if(act==='coachPlayPaper'){
+    const p = state.coachPaper;
+    if(!p || !p.qs || !p.qs.length){ toast('先发一个题目文件'); return; }
+    const begin = function(){ startPaper(p.qs, p.label); };
+    if(state.session && state.session.qs && state.session.qs.some(function(q){ return q.chosen<0; })){
+      const left = state.session.qs.filter(function(q){ return q.chosen<0; }).length;
+      showDialog('当前还有未完成的练习', '打开导入的这套题会替换掉当前进度；已学词、错题本不受影响。', '打开这套题', '先不打开', function(ok){ if(ok) begin(); });
+      return;
+    }
+    begin();
+    return;
+  }
+  if(act==='paperAuto'){ paperAutoAll(); return; }
   if(act==='coachClear'){
     coachReqSeq++;
     coachBusy = false;
+    coachPendingFile = null;
     state.coach = [];
     save(); render(); return;
   }
@@ -23164,12 +24055,13 @@ document.addEventListener('click', function(e){
   }
   if(act==='exitQuiz'){ exitSheetOpen=true; sheetOpen=false; render(); return; }
   if(act==='exitCancel'){ exitSheetOpen=false; render(); return; }
-  if(act==='exitSave'){ exitSheetOpen=false; const back=(S && S.mode==='refine')?'#/refine':'#/home'; save(); go(back); return; }
+  if(act==='exitSave'){ exitSheetOpen=false; const back=(S && S.mode==='refine')?'#/refine':((S && S.mode==='paper')?'#/analysis':'#/home'); save(); go(back); return; }
   if(act==='exitDrop'){
     const isRf = !!(S && S.mode==='refine');
+    const isPaper = !!(S && S.mode==='paper');
     showDialog('放弃这一轮的临时进度？', '已答过的单词记录、错题本不会受影响，只是下次重新打乱开始。', '放弃进度', '再想想', function(ok){
       if(!ok) return;
-      state.session=null; S=null; exitSheetOpen=false; save(); go(isRf?'#/refine':'#/home');
+      state.session=null; S=null; exitSheetOpen=false; save(); go(isRf?'#/refine':(isPaper?'#/analysis':'#/home'));
     });
     return;
   }
@@ -23205,7 +24097,8 @@ document.addEventListener('click', function(e){
     if(!S) return;
     const oi=parseInt(el.getAttribute('data-o'),10);
     const q=S.qs[S.pos];
-    if(q && q.chosen>=0){                       // 已答：点任一选项都只看它对应哪个词（包括自己选错的那个）
+    if(q && q.chosen>=0){
+      if(q.custom) return;
       q.peek = (q.peek===oi ? null : oi); render();
       return;
     }
@@ -23232,6 +24125,19 @@ document.addEventListener('click', function(e){
     const b = lastResult.book || planBookId();
     const label = lastResult.mode==='day' ? (planBookLabelFor(b)+' Day '+(lastResult.day+1)+' · 错题重练') : '错题重练';
     startSession(idxs, 'wrong', lastResult.day, label, planIdsFor(b), b);
+    return;
+  }
+  if(act==='paperRetryWrong' || act==='paperRetrySkip' || act==='paperRestart'){
+    if(!lastResult || lastResult.mode!=='paper') return;
+    const pick = function(x){
+      if(act==='paperRetryWrong') return x.answered && !x.ok;
+      if(act==='paperRetrySkip') return !x.answered;
+      return true;
+    };
+    const items = lastResult.items.filter(pick).map(function(x){ return x.q; });
+    if(!items.length){ toast(act==='paperRetrySkip'?'没有未答题':'没有错题'); return; }
+    const tag = act==='paperRetryWrong' ? ' · 错题重练' : (act==='paperRetrySkip' ? ' · 继续未答' : ' · 重做');
+    startPaper(items, (lastResult.label||'导入题目')+tag);
     return;
   }
   if(act==='wrongAll'){
@@ -23384,6 +24290,12 @@ document.addEventListener('input', function(e){
 });
 
 document.addEventListener('change', function(e){
+  if(e.target && e.target.id==='coachFile'){
+    const cf = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if(cf) coachHandleFile(cf);
+    return;
+  }
   if(e.target && e.target.id==='updateFile'){
     const uf = e.target.files && e.target.files[0];
     e.target.value = '';
